@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Shadow Government — Issue Page Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0d0d0d;
+    --white: #f7f5f0;
+    --red: #c0392b;
+    --red-dark: #922b21;
+    --blue: #1a3a5c;
+    --blue-mid: #2471a3;
+    --blue-light: #d6e8f7;
+    --gold: #b7950b;
+    --gold-light: #fef9e7;
+    --gray-1: #2c2c2c;
+    --gray-2: #555;
+    --gray-3: #888;
+    --gray-4: #ccc;
+    --gray-5: #eee;
+    --green: #1e8449;
+    --green-light: #d5f5e3;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--gray-5);
+    color: var(--black);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ── TOPBAR ── */
+  #topbar {
+    background: var(--black);
+    color: var(--white);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 3px solid var(--red);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'IBM Plex Serif', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+  .logo span { color: var(--red); }
+  .topbar-title {
+    font-size: 0.82rem;
+    color: var(--gray-4);
+    border-left: 1px solid var(--gray-2);
+    padding-left: 16px;
+    margin-left: 4px;
+  }
+  .topbar-title strong { color: var(--gold); }
+
+  /* ── LAYOUT ── */
+  #app {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+  }
+
+  /* ── PROGRESS BAR ── */
+  #progress-wrap {
+    background: var(--white);
+    border: 1.5px solid var(--gray-4);
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-bottom: 28px;
+    position: sticky;
+    top: 55px;
+    z-index: 90;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--gray-2);
+    margin-bottom: 8px;
+  }
+  .progress-label .pct { color: var(--blue); font-family: 'IBM Plex Mono', monospace; }
+  .progress-track {
+    height: 8px;
+    background: var(--gray-5);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--blue) 0%, var(--blue-mid) 100%);
+    border-radius: 4px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+  .progress-steps {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .step-pip {
+    font-size: 0.68rem;
+    padding: 3px 10px;
+    border-radius: 12px;
+    background: var(--gray-5);
+    color: var(--gray-3);
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--gray-4);
+    transition: all 0.15s;
+  }
+  .step-pip:hover { background: var(--blue-light); color: var(--blue); border-color: var(--blue-mid); }
+  .step-pip.done { background: var(--green-light); color: var(--green); border-color: var(--green); }
+  .step-pip.current { background: var(--blue); color: var(--white); border-color: var(--blue); }
+
+  /* ── SECTIONS ── */
+  .form-section {
+    background: var(--white);
+    border: 1.5px solid var(--gray-4);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .form-section:focus-within { box-shadow: 0 0 0 3px rgba(36,113,163,0.15); border-color: var(--blue-mid); }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: var(--blue);
+    cursor: pointer;
+    user-select: none;
+  }
+  .section-header-icon { font-size: 1.1rem; }
+  .section-header-title {
+    font-family: 'IBM Plex Serif', serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--white);
+    flex: 1;
+  }
+  .section-header-sub {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.5);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .section-header-check {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.2);
+    transition: color 0.2s;
+  }
+  .form-section.complete .section-header-check { color: #58d68d; }
+  .section-header-chevron {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.4);
+    transition: transform 0.2s;
+    margin-left: 4px;
+  }
+  .form-section.collapsed .section-header-chevron { transform: rotate(-90deg); }
+
+  .section-body {
+    padding: 20px 18px;
+  }
+  .form-section.collapsed .section-body { display: none; }
+
+  /* ── FORM FIELDS ── */
+  .field {
+    margin-bottom: 18px;
+  }
+  .field:last-child { margin-bottom: 0; }
+
+  .field-label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--blue);
+    margin-bottom: 5px;
+  }
+  .field-hint {
+    font-size: 0.75rem;
+    color: var(--gray-3);
+    margin-bottom: 6px;
+    font-style: italic;
+  }
+
+  input[type="text"],
+  textarea,
+  select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1.5px solid var(--gray-4);
+    border-radius: 5px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.87rem;
+    color: var(--black);
+    background: var(--white);
+    transition: border-color 0.15s;
+    line-height: 1.5;
+  }
+  input[type="text"]:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: var(--blue-mid);
+    box-shadow: 0 0 0 3px rgba(36,113,163,0.1);
+  }
+  textarea { resize: vertical; min-height: 80px; }
+  textarea.tall { min-height: 120px; }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 10px;
+    align-items: start;
+  }
+  .field-row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+
+  /* ── REPEATING BLOCKS ── */
+  .repeat-block {
+    border: 1.5px solid var(--gray-4);
+    border-radius: 6px;
+    padding: 14px;
+    margin-bottom: 12px;
+    background: var(--gray-5);
+    position: relative;
+  }
+  .repeat-block-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--gray-3);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 10px;
+  }
+  .btn-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border: 1.5px dashed var(--blue-mid);
+    border-radius: 5px;
+    background: var(--blue-light);
+    color: var(--blue);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-top: 4px;
+  }
+  .btn-add:hover { background: var(--blue); color: var(--white); border-style: solid; }
+  .btn-remove {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: var(--gray-3);
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    padding: 2px 6px;
+    border-radius: 3px;
+    transition: all 0.15s;
+  }
+  .btn-remove:hover { background: #fadbd8; color: var(--red); }
+
+  /* urgency selector */
+  .urgency-row { display: flex; gap: 8px; }
+  .urgency-btn {
+    flex: 1;
+    padding: 7px 8px;
+    border: 1.5px solid var(--gray-4);
+    border-radius: 5px;
+    background: var(--white);
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    color: var(--gray-2);
+  }
+  .urgency-btn.selected-urgent { border-color: var(--red); background: #fadbd8; color: var(--red-dark); }
+  .urgency-btn.selected-watch  { border-color: var(--gold); background: var(--gold-light); color: var(--gold); }
+  .urgency-btn.selected-win    { border-color: var(--green); background: var(--green-light); color: var(--green); }
+
+  /* actor type selector */
+  .actor-type-row { display: flex; gap: 8px; margin-bottom: 10px; }
+  .actor-type-btn {
+    flex: 1;
+    padding: 6px 8px;
+    border: 1.5px solid var(--gray-4);
+    border-radius: 5px;
+    background: var(--white);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    color: var(--gray-2);
+  }
+  .actor-type-btn.selected-ally     { border-color: var(--green); background: var(--green-light); color: var(--green); }
+  .actor-type-btn.selected-opponent { border-color: var(--red); background: #fadbd8; color: var(--red-dark); }
+  .actor-type-btn.selected-target   { border-color: var(--gold); background: var(--gold-light); color: var(--gold); }
+
+  /* ── DIVIDER ── */
+  .field-divider {
+    height: 1px;
+    background: var(--gray-4);
+    margin: 18px 0;
+  }
+
+  /* ── EMOJI PICKER ── */
+  .emoji-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+  }
+  .emoji-opt {
+    font-size: 1.4rem;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 5px;
+    border: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  .emoji-opt:hover { background: var(--blue-light); }
+  .emoji-opt.selected { border-color: var(--blue); background: var(--blue-light); }
+
+  /* ── GENERATE BUTTON ── */
+  #generate-wrap {
+    background: var(--white);
+    border: 1.5px solid var(--gray-4);
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    margin-top: 24px;
+  }
+  .btn-generate {
+    display: inline-block;
+    padding: 14px 40px;
+    background: var(--red);
+    color: var(--white);
+    border: none;
+    border-radius: 6px;
+    font-family: 'IBM Plex Serif', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: -0.3px;
+  }
+  .btn-generate:hover { background: var(--red-dark); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(192,57,43,0.3); }
+  .btn-generate-sub { font-size: 0.8rem; color: var(--gray-3); margin-top: 10px; }
+
+  /* ── SUCCESS / DOWNLOAD ── */
+  #download-wrap {
+    display: none;
+    background: var(--green-light);
+    border: 2px solid var(--green);
+    border-radius: 8px;
+    padding: 28px 24px;
+    text-align: center;
+    margin-top: 20px;
+  }
+  #download-wrap h2 {
+    font-family: 'IBM Plex Serif', serif;
+    font-size: 1.3rem;
+    color: var(--green);
+    margin-bottom: 8px;
+  }
+  #download-wrap p { font-size: 0.87rem; color: var(--gray-1); margin-bottom: 18px; }
+  .btn-download {
+    display: inline-block;
+    padding: 12px 32px;
+    background: var(--green);
+    color: var(--white);
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.18s;
+    margin: 0 6px;
+  }
+  .btn-download:hover { background: #176339; }
+  .btn-reset {
+    display: inline-block;
+    padding: 12px 24px;
+    background: var(--white);
+    color: var(--gray-2);
+    border: 1.5px solid var(--gray-4);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 0 6px;
+    transition: all 0.18s;
+  }
+  .btn-reset:hover { border-color: var(--blue-mid); color: var(--blue); }
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="logo">A <span>Shadow</span> Government</div>
+  <div class="topbar-title">⚙️ <strong>Issue Page Builder</strong> — fill in the form, get a finished page</div>
+</div>
+
+<div id="app">
+
+  <!-- PROGRESS -->
+  <div id="progress-wrap">
+    <div class="progress-label">
+      <span>Your progress</span>
+      <span class="pct" id="pct-label">0% complete</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <div class="progress-steps">
+      <span class="step-pip current" data-section="0" onclick="jumpTo(0)">1 · Basics</span>
+      <span class="step-pip" data-section="1" onclick="jumpTo(1)">2 · The Issue</span>
+      <span class="step-pip" data-section="2" onclick="jumpTo(2)">3 · Key Facts</span>
+      <span class="step-pip" data-section="3" onclick="jumpTo(3)">4 · Who's Involved</span>
+      <span class="step-pip" data-section="4" onclick="jumpTo(4)">5 · What's Happening</span>
+      <span class="step-pip" data-section="5" onclick="jumpTo(5)">6 · Generate</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       SECTION 1: BASICS
+  ═══════════════════════════════ -->
+  <div class="form-section" id="sec-0">
+    <div class="section-header" onclick="toggleSection(0)">
+      <span class="section-header-icon">🏷️</span>
+      <div>
+        <div class="section-header-title">Step 1 — The Basics</div>
+      </div>
+      <span class="section-header-sub">Issue name, emoji, working group info</span>
+      <span class="section-header-check">✓</span>
+      <span class="section-header-chevron">▼</span>
+    </div>
+    <div class="section-body">
+
+      <div class="field">
+        <label class="field-label">Issue Name</label>
+        <div class="field-hint">Short and clear. Examples: Voting Rights · Healthcare · Dark Money · Climate</div>
+        <input type="text" id="f-issue-name" placeholder="e.g. Voting Rights" oninput="updateProgress()">
+      </div>
+
+      <div class="field">
+        <label class="field-label">Choose an Emoji for this Issue</label>
+        <div class="field-hint">Click one — it will appear in the nav and topbar</div>
+        <div class="emoji-row" id="emoji-row">
+          <span class="emoji-opt" onclick="selectEmoji(this, '🗳️')">🗳️</span>
+          <span class="emoji-opt" onclick="selectEmoji(this, '⚖️')">⚖️</span>
+          <span class="emoji-opt" onclick="selectEmoji(this, '🏥')">🏥</span>
+          <span class="emoji-opt" onclick="selectEmoji(this, '🌍')">🌍</span>
+          <span class="emoji-opt" onclick="selectEmoji(this, '💰')">💰</span>
+          <span class="emoji-opt" onclick="selectEmoji(this, '🎓')">🎓</span>
+          <span class="emoji-opt" onclick="selectEmoji(this, '🏛️')">🏛️</span>
+          <span class="emoji-opt" onclick="selectEmoji(this, '🏘️')">🏘️</span>
+          <span class="emoji-opt" onclick="selectEmoji(this, '👮')">👮</span>
+          <span class="emoji-opt" onclick="selectEmoji(this, '📡')">📡</span>
+          <span class="emoji-opt" onclick="selectEmoji(this, '🛡️')">🛡️</span>
+          <span class="emoji-opt" onclick="selectEmoji(this, '🌾')">🌾</span>
+          <span class="emoji-opt" onclick="selectEmoji(this, '🔬')">🔬</span>
+          <span class="emoji-opt" onclick="selectEmoji(this, '🌐')">🌐</span>
+          <span class="emoji-opt" onclick="selectEmoji(this, '✊')">✊</span>
+          <span class="emoji-opt" onclick="selectEmoji(this, '📣')">📣</span>
+        </div>
+        <input type="text" id="f-emoji" placeholder="Or type any emoji here" style="margin-top:8px; width:120px;" oninput="updateProgress()">
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label">Members</label>
+          <div class="field-hint">How many in the working group?</div>
+          <input type="text" id="f-members" placeholder="e.g. 623">
+        </div>
+        <div class="field">
+          <label class="field-label">Active Campaigns</label>
+          <div class="field-hint">Number of live campaigns</div>
+          <input type="text" id="f-campaigns" placeholder="e.g. 8">
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       SECTION 2: THE ISSUE
+  ═══════════════════════════════ -->
+  <div class="form-section collapsed" id="sec-1">
+    <div class="section-header" onclick="toggleSection(1)">
+      <span class="section-header-icon">❓</span>
+      <div>
+        <div class="section-header-title">Step 2 — So What's the Issue?</div>
+      </div>
+      <span class="section-header-sub">The briefing — what's broken and why it matters</span>
+      <span class="section-header-check">✓</span>
+      <span class="section-header-chevron">▼</span>
+    </div>
+    <div class="section-body">
+
+      <div class="field">
+        <label class="field-label">One-line Summary</label>
+        <div class="field-hint">The core of the issue in one or two punchy sentences. This appears at the top of the briefing panel in bold.</div>
+        <textarea id="f-summary" placeholder="e.g. The right to vote is under systematic, coordinated attack across the United States — and it has been for decades. This is not paranoia. It is documented, litigated, and ongoing." oninput="updateProgress()"></textarea>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Background Paragraph</label>
+        <div class="field-hint">How did we get here? History, key turning points, what changed and when.</div>
+        <textarea class="tall" id="f-para1" placeholder="e.g. Since the Supreme Court's 2013 Shelby County v. Holder decision..." oninput="updateProgress()"></textarea>
+      </div>
+
+      <div class="field">
+        <label class="field-label">How It Works Paragraph</label>
+        <div class="field-hint">The mechanisms. How the problem actually operates day to day. Be specific.</div>
+        <textarea class="tall" id="f-para2" placeholder="e.g. The methods are numerous and mutually reinforcing: voter ID laws, roll purges, polling place closures..."></textarea>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Why It Matters Paragraph</label>
+        <div class="field-hint">Stakes, urgency, connection to other issues. Why should someone care about this one?</div>
+        <textarea class="tall" id="f-para3" placeholder="e.g. The stakes are not abstract. A democracy in which not everyone can vote equally is not, by definition, a democracy..."></textarea>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       SECTION 3: KEY FACTS
+  ═══════════════════════════════ -->
+  <div class="form-section collapsed" id="sec-2">
+    <div class="section-header" onclick="toggleSection(2)">
+      <span class="section-header-icon">📌</span>
+      <div>
+        <div class="section-header-title">Step 3 — Key Facts</div>
+      </div>
+      <span class="section-header-sub">3–6 sharp, sourced facts</span>
+      <span class="section-header-check">✓</span>
+      <span class="section-header-chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="field-hint" style="margin-bottom:14px;">Enter your most compelling facts. Include the source in parentheses at the end. Aim for 3–6 facts.</div>
+      <div id="facts-container">
+        <div class="repeat-block" id="fact-0">
+          <div class="repeat-block-title">Fact 1</div>
+          <input type="text" placeholder="e.g. Since 2013, states have enacted 94+ laws restricting voting access (Brennan Center)">
+        </div>
+        <div class="repeat-block" id="fact-1">
+          <div class="repeat-block-title">Fact 2</div>
+          <input type="text" placeholder="e.g. 868 polling places closed in previously-covered states between 2013–2019">
+        </div>
+        <div class="repeat-block" id="fact-2">
+          <div class="repeat-block-title">Fact 3</div>
+          <input type="text" placeholder="e.g. 17 million voters were purged from rolls in the 2020 election cycle">
+        </div>
+      </div>
+      <button class="btn-add" onclick="addFact()">＋ Add another fact</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       SECTION 4: WHO'S INVOLVED
+  ═══════════════════════════════ -->
+  <div class="form-section collapsed" id="sec-3">
+    <div class="section-header" onclick="toggleSection(3)">
+      <span class="section-header-icon">👥</span>
+      <div>
+        <div class="section-header-title">Step 4 — Who's Involved?</div>
+      </div>
+      <span class="section-header-sub">Allies, opponents, pressure targets</span>
+      <span class="section-header-check">✓</span>
+      <span class="section-header-chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="field-hint" style="margin-bottom:14px;">Add organizations, agencies, officials, or groups. Label each as Ally, Opponent, or Pressure Target.</div>
+      <div id="actors-container">
+        <div class="repeat-block" id="actor-0">
+          <button class="btn-remove" onclick="removeBlock('actor-0')">✕</button>
+          <div class="actor-type-row">
+            <button class="actor-type-btn selected-ally" onclick="selectActorType(this, 'actor-0', 'ally')">✅ Ally</button>
+            <button class="actor-type-btn" onclick="selectActorType(this, 'actor-0', 'opponent')">❌ Opponent</button>
+            <button class="actor-type-btn" onclick="selectActorType(this, 'actor-0', 'target')">🎯 Pressure Target</button>
+          </div>
+          <input type="hidden" class="actor-type-val" value="ally">
+          <input type="text" class="actor-name-val" placeholder="Organization or person name" style="margin-bottom:8px;">
+          <textarea class="actor-desc-val" placeholder="What do they do on this issue? One or two sentences." style="min-height:60px;"></textarea>
+        </div>
+      </div>
+      <button class="btn-add" onclick="addActor()">＋ Add another player</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       SECTION 5: WHAT'S HAPPENING
+  ═══════════════════════════════ -->
+  <div class="form-section collapsed" id="sec-4">
+    <div class="section-header" onclick="toggleSection(4)">
+      <span class="section-header-icon">⚡</span>
+      <div>
+        <div class="section-header-title">Step 5 — What's Happening Right Now?</div>
+      </div>
+      <span class="section-header-sub">Current news headlines and developments</span>
+      <span class="section-header-check">✓</span>
+      <span class="section-header-chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="field-hint" style="margin-bottom:14px;">Add 2–5 current headlines. Put the most urgent first. These appear in the live feed panel.</div>
+      <div id="headlines-container">
+        <div class="repeat-block" id="hl-0">
+          <button class="btn-remove" onclick="removeBlock('hl-0')">✕</button>
+          <div class="repeat-block-title">Headline 1</div>
+          <div class="field-hint">Urgency level:</div>
+          <div class="urgency-row" style="margin-bottom:10px;">
+            <button class="urgency-btn selected-urgent" onclick="selectUrgency(this, 'hl-0', 'urgent')">🚨 Urgent — action needed</button>
+            <button class="urgency-btn" onclick="selectUrgency(this, 'hl-0', 'watch')">👀 Watch — developing</button>
+            <button class="urgency-btn" onclick="selectUrgency(this, 'hl-0', 'win')">🎉 Win — good news</button>
+          </div>
+          <input type="hidden" class="hl-urgency-val" value="urgent">
+          <input type="text" class="hl-title-val" placeholder="Headline text — what happened, where, what's at stake" style="margin-bottom:8px;">
+          <div class="field-row-3">
+            <input type="text" class="hl-age-val" placeholder="When (e.g. 2 days ago)">
+            <input type="text" class="hl-location-val" placeholder="Where (e.g. Georgia)">
+            <input type="text" class="hl-tag-val" placeholder="Tag (e.g. In litigation)">
+          </div>
+        </div>
+      </div>
+      <button class="btn-add" onclick="addHeadline()">＋ Add another headline</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       GENERATE
+  ═══════════════════════════════ -->
+  <div id="generate-wrap">
+    <div style="font-family:'IBM Plex Serif',serif; font-size:1.1rem; font-weight:700; color:var(--blue); margin-bottom:8px;">Ready to build your page?</div>
+    <div style="font-size:0.85rem; color:var(--gray-2); margin-bottom:20px;">Fill in as much as you have — you can always upload an updated version later. Click the button and your finished page downloads automatically.</div>
+    <button class="btn-generate" onclick="generatePage()">⚙️ Generate My Issue Page</button>
+    <div class="btn-generate-sub">Your finished HTML file will download to your computer. Then upload it to GitHub.</div>
+  </div>
+
+  <!-- DOWNLOAD SUCCESS -->
+  <div id="download-wrap">
+    <h2>✅ Your Issue Page is Ready!</h2>
+    <p>Your file has been generated and is ready to download. Save it to your Desktop, then upload it to your GitHub repo.</p>
+    <a id="download-link" class="btn-download" href="#" download>⬇️ Download Your Page</a>
+    <button class="btn-reset" onclick="resetForm()">↺ Build Another Issue Page</button>
+    <div style="margin-top:18px; padding:14px; background:white; border-radius:6px; font-size:0.8rem; color:var(--gray-2); text-align:left;">
+      <strong style="color:var(--blue);">Next step:</strong> Go to your GitHub repo → Add file → Upload files → drag your downloaded file in → Commit changes. Done!
+    </div>
+  </div>
+
+</div><!-- end #app -->
+
+<script>
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let selectedEmoji = '';
+let factCount = 3;
+let actorCount = 1;
+let hlCount = 1;
+
+// ─────────────────────────────────────────────
+// SECTION TOGGLE
+// ─────────────────────────────────────────────
+function toggleSection(i) {
+  const sec = document.getElementById('sec-' + i);
+  sec.classList.toggle('collapsed');
+}
+
+function jumpTo(i) {
+  // open target, scroll to it
+  const sec = document.getElementById('sec-' + i);
+  sec.classList.remove('collapsed');
+  sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ─────────────────────────────────────────────
+// PROGRESS
+// ─────────────────────────────────────────────
+function updateProgress() {
+  const fields = [
+    document.getElementById('f-issue-name').value.trim(),
+    document.getElementById('f-summary').value.trim(),
+    document.getElementById('f-para1').value.trim(),
+  ];
+  const filled = fields.filter(f => f.length > 0).length;
+  const pct = Math.round((filled / fields.length) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('pct-label').textContent = pct + '% complete';
+
+  // pip states
+  const pips = document.querySelectorAll('.step-pip');
+  pips.forEach((p, idx) => {
+    p.classList.remove('current', 'done');
+  });
+  if (document.getElementById('f-issue-name').value.trim()) {
+    document.querySelector('[data-section="0"]').classList.add('done');
+    document.querySelector('[data-section="1"]').classList.add('current');
+  } else {
+    document.querySelector('[data-section="0"]').classList.add('current');
+  }
+  if (document.getElementById('f-summary').value.trim()) {
+    document.querySelector('[data-section="1"]').classList.add('done');
+  }
+}
+
+// ─────────────────────────────────────────────
+// EMOJI
+// ─────────────────────────────────────────────
+function selectEmoji(el, emoji) {
+  document.querySelectorAll('.emoji-opt').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedEmoji = emoji;
+  document.getElementById('f-emoji').value = emoji;
+}
+
+// ─────────────────────────────────────────────
+// ADD / REMOVE REPEATING BLOCKS
+// ─────────────────────────────────────────────
+function addFact() {
+  factCount++;
+  const n = factCount;
+  const c = document.getElementById('facts-container');
+  const d = document.createElement('div');
+  d.className = 'repeat-block';
+  d.id = 'fact-' + n;
+  d.innerHTML = `
+    <button class="btn-remove" onclick="removeBlock('fact-${n}')">✕</button>
+    <div class="repeat-block-title">Fact ${n}</div>
+    <input type="text" placeholder="Enter fact with source in parentheses">
+  `;
+  c.appendChild(d);
+}
+
+function addActor() {
+  actorCount++;
+  const n = actorCount;
+  const c = document.getElementById('actors-container');
+  const d = document.createElement('div');
+  d.className = 'repeat-block';
+  d.id = 'actor-' + n;
+  d.innerHTML = `
+    <button class="btn-remove" onclick="removeBlock('actor-${n}')">✕</button>
+    <div class="actor-type-row">
+      <button class="actor-type-btn selected-ally" onclick="selectActorType(this, 'actor-${n}', 'ally')">✅ Ally</button>
+      <button class="actor-type-btn" onclick="selectActorType(this, 'actor-${n}', 'opponent')">❌ Opponent</button>
+      <button class="actor-type-btn" onclick="selectActorType(this, 'actor-${n}', 'target')">🎯 Pressure Target</button>
+    </div>
+    <input type="hidden" class="actor-type-val" value="ally">
+    <input type="text" class="actor-name-val" placeholder="Organization or person name" style="margin-bottom:8px;">
+    <textarea class="actor-desc-val" placeholder="What do they do on this issue?" style="min-height:60px;"></textarea>
+  `;
+  c.appendChild(d);
+}
+
+function addHeadline() {
+  hlCount++;
+  const n = hlCount;
+  const c = document.getElementById('headlines-container');
+  const d = document.createElement('div');
+  d.className = 'repeat-block';
+  d.id = 'hl-' + n;
+  d.innerHTML = `
+    <button class="btn-remove" onclick="removeBlock('hl-${n}')">✕</button>
+    <div class="repeat-block-title">Headline ${n}</div>
+    <div class="urgency-row" style="margin-bottom:10px;">
+      <button class="urgency-btn selected-urgent" onclick="selectUrgency(this, 'hl-${n}', 'urgent')">🚨 Urgent</button>
+      <button class="urgency-btn" onclick="selectUrgency(this, 'hl-${n}', 'watch')">👀 Watch</button>
+      <button class="urgency-btn" onclick="selectUrgency(this, 'hl-${n}', 'win')">🎉 Win</button>
+    </div>
+    <input type="hidden" class="hl-urgency-val" value="urgent">
+    <input type="text" class="hl-title-val" placeholder="Headline text" style="margin-bottom:8px;">
+    <div class="field-row-3">
+      <input type="text" class="hl-age-val" placeholder="When">
+      <input type="text" class="hl-location-val" placeholder="Where">
+      <input type="text" class="hl-tag-val" placeholder="Tag">
+    </div>
+  `;
+  c.appendChild(d);
+}
+
+function removeBlock(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+// ─────────────────────────────────────────────
+// TYPE SELECTORS
+// ─────────────────────────────────────────────
+function selectActorType(btn, blockId, type) {
+  const block = document.getElementById(blockId);
+  block.querySelectorAll('.actor-type-btn').forEach(b => {
+    b.classList.remove('selected-ally', 'selected-opponent', 'selected-target');
+  });
+  btn.classList.add('selected-' + type);
+  block.querySelector('.actor-type-val').value = type;
+}
+
+function selectUrgency(btn, blockId, level) {
+  const block = document.getElementById(blockId);
+  block.querySelectorAll('.urgency-btn').forEach(b => {
+    b.classList.remove('selected-urgent', 'selected-watch', 'selected-win');
+  });
+  btn.classList.add('selected-' + level);
+  block.querySelector('.hl-urgency-val').value = level;
+}
+
+// ─────────────────────────────────────────────
+// COLLECT DATA
+// ─────────────────────────────────────────────
+function collectData() {
+  const emoji = document.getElementById('f-emoji').value.trim() || selectedEmoji || '📋';
+  const name  = document.getElementById('f-issue-name').value.trim() || 'My Issue';
+  const members   = document.getElementById('f-members').value.trim() || '0';
+  const campaigns = document.getElementById('f-campaigns').value.trim() || '0';
+  const summary = document.getElementById('f-summary').value.trim();
+  const para1   = document.getElementById('f-para1').value.trim();
+  const para2   = document.getElementById('f-para2').value.trim();
+  const para3   = document.getElementById('f-para3').value.trim();
+
+  // Facts
+  const facts = [];
+  document.querySelectorAll('#facts-container .repeat-block').forEach(b => {
+    const inp = b.querySelector('input[type="text"]');
+    if (inp && inp.value.trim()) facts.push(inp.value.trim());
+  });
+
+  // Actors
+  const actors = [];
+  document.querySelectorAll('#actors-container .repeat-block').forEach(b => {
+    const type = b.querySelector('.actor-type-val')?.value || 'ally';
+    const aname = b.querySelector('.actor-name-val')?.value.trim() || '';
+    const desc  = b.querySelector('.actor-desc-val')?.value.trim() || '';
+    if (aname) actors.push({ type, name: aname, desc });
+  });
+
+  // Headlines
+  const headlines = [];
+  document.querySelectorAll('#headlines-container .repeat-block').forEach(b => {
+    const urgency  = b.querySelector('.hl-urgency-val')?.value || 'urgent';
+    const title    = b.querySelector('.hl-title-val')?.value.trim() || '';
+    const age      = b.querySelector('.hl-age-val')?.value.trim() || '';
+    const location = b.querySelector('.hl-location-val')?.value.trim() || '';
+    const tag      = b.querySelector('.hl-tag-val')?.value.trim() || '';
+    if (title) headlines.push({ urgency, title, age, location, tag });
+  });
+
+  return { emoji, name, members, campaigns, summary, para1, para2, para3, facts, actors, headlines };
+}
+
+// ─────────────────────────────────────────────
+// GENERATE HTML
+// ─────────────────────────────────────────────
+function generatePage() {
+  const d = collectData();
+
+  // Build facts HTML
+  const factsHTML = d.facts.map(f =>
+    `          <div class="fact-item"><div class="fact-bullet"></div><div>${esc(f)}</div></div>`
+  ).join('\n');
+
+  // Build actors HTML
+  const actorClassMap = { ally: 'ally', opponent: 'opponent', target: 'neutral' };
+  const actorLabelMap = { ally: 'Ally', opponent: 'Opponent', target: 'Pressure Target' };
+  const actorsHTML = d.actors.map(a => `
+          <div class="actor-card ${actorClassMap[a.type]}">
+            <div class="actor-type ${actorClassMap[a.type]}">${actorLabelMap[a.type]}</div>
+            <div class="actor-name">${esc(a.name)}</div>
+            <div class="actor-desc">${esc(a.desc)}</div>
+          </div>`).join('\n');
+
+  // Build headlines HTML
+  const urgencyColorMap = { urgent: 'var(--red)', watch: 'var(--gold)', win: 'var(--green)' };
+  const urgencyTagMap   = { urgent: '🚨 Action needed', watch: '👀 Watch closely', win: '🎉 Win to build on' };
+  const headlinesHTML = d.headlines.map(h => {
+    const meta = [h.age, h.location, h.tag || urgencyTagMap[h.urgency]].filter(Boolean).join(' · ');
+    return `
+        <div class="headline-item">
+          <div class="headline-dot" style="background:${urgencyColorMap[h.urgency]}"></div>
+          <div class="headline-text">
+            <div class="headline-title">${esc(h.title)}</div>
+            <div class="headline-meta">${esc(meta)}</div>
+          </div>
+          <div class="headline-arrow">›</div>
+        </div>`;
+  }).join('\n');
+
+  const paras = [d.para1, d.para2, d.para3].filter(Boolean)
+    .map(p => `          <p>${esc(p)}</p>`).join('\n');
+
+  // Full page output — using the same design as issue_template.html
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Shadow Government — ${esc(d.name)}</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black:#0d0d0d;--white:#f7f5f0;--red:#c0392b;--red-dark:#922b21;
+    --blue:#1a3a5c;--blue-mid:#2471a3;--blue-light:#d6e8f7;
+    --gold:#b7950b;--gold-light:#fef9e7;--gray-1:#2c2c2c;--gray-2:#555;
+    --gray-3:#888;--gray-4:#ccc;--gray-5:#eee;--green:#1e8449;--green-light:#d5f5e3;
+    --topbar-h:44px;--left-w:170px;--right-w:180px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'IBM Plex Sans',sans-serif;background:var(--gray-5);color:var(--black);font-size:14px;line-height:1.55;height:100vh;overflow:hidden;}
+  #topbar{height:var(--topbar-h);background:var(--black);color:var(--white);display:flex;align-items:center;padding:0 16px;gap:18px;border-bottom:3px solid var(--red);position:fixed;top:0;left:0;right:0;z-index:100;}
+  .logo{font-family:'IBM Plex Serif',serif;font-size:1.05rem;font-weight:700;white-space:nowrap;letter-spacing:-0.3px;}
+  .logo span{color:var(--red);}
+  .issue-label{background:var(--red);color:var(--white);font-size:0.72rem;font-weight:700;padding:3px 10px;border-radius:3px;letter-spacing:0.5px;text-transform:uppercase;}
+  .issue-title{font-family:'IBM Plex Serif',serif;font-size:1rem;font-weight:600;color:var(--white);flex:1;}
+  .topbar-stat{font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--gold);white-space:nowrap;}
+  #layout{display:grid;grid-template-columns:var(--left-w) 1fr var(--right-w);height:calc(100vh - var(--topbar-h));margin-top:var(--topbar-h);}
+  #left-nav{background:var(--blue);height:100%;overflow-y:auto;display:flex;flex-direction:column;scrollbar-width:thin;}
+  .nav-section-label{font-family:'IBM Plex Mono',monospace;font-size:0.62rem;font-weight:600;color:rgba(255,255,255,0.35);letter-spacing:1px;text-transform:uppercase;padding:14px 12px 5px;}
+  .nav-item{display:flex;align-items:center;gap:8px;padding:8px 12px;color:#a9c4db;font-size:0.8rem;font-weight:500;cursor:pointer;border-left:3px solid transparent;transition:all 0.15s;text-decoration:none;}
+  .nav-item:hover{background:rgba(255,255,255,0.08);color:var(--white);}
+  .nav-item.active{background:rgba(255,255,255,0.12);color:var(--white);border-left-color:var(--gold);font-weight:600;}
+  .nav-icon{font-size:0.95rem;flex-shrink:0;width:18px;text-align:center;}
+  .nav-divider{height:1px;background:rgba(255,255,255,0.1);margin:8px 12px;}
+  .nav-army-box{margin:10px 10px 14px;background:rgba(255,255,255,0.07);border-radius:5px;padding:10px;}
+  .nav-army-box .label{font-size:0.65rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;font-family:'IBM Plex Mono',monospace;}
+  .nav-army-row{display:flex;justify-content:space-between;font-size:0.72rem;color:#a9c4db;margin-bottom:3px;}
+  .nav-army-row .num{color:var(--gold);font-family:'IBM Plex Mono',monospace;font-weight:600;}
+  #middle{display:flex;flex-direction:column;height:100%;overflow:hidden;background:var(--gray-5);}
+  .middle-box{display:flex;flex-direction:column;border-bottom:2px solid var(--gray-4);overflow:hidden;}
+  #box-issue{flex:4;min-height:0;}#box-who{flex:3;min-height:0;}#box-now{flex:2;min-height:0;}
+  .box-header{display:flex;align-items:center;gap:10px;padding:8px 14px;background:var(--blue);flex-shrink:0;}
+  .box-header-icon{font-size:1rem;}
+  .box-header-title{font-family:'IBM Plex Serif',serif;font-size:0.9rem;font-weight:700;color:var(--white);flex:1;}
+  .box-header-tag{font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:rgba(255,255,255,0.45);letter-spacing:0.5px;}
+  .box-body{flex:1;overflow-y:auto;padding:14px;background:var(--white);scrollbar-width:thin;scrollbar-color:var(--gray-4) transparent;}
+  .issue-summary{font-family:'IBM Plex Serif',serif;font-size:1.05rem;font-weight:600;color:var(--blue);line-height:1.4;margin-bottom:12px;padding-bottom:10px;border-bottom:1.5px solid var(--blue-light);}
+  .issue-body{font-size:0.85rem;color:var(--gray-1);line-height:1.7;}
+  .issue-body p{margin-bottom:10px;}
+  .key-facts{margin-top:14px;}
+  .key-facts-title{font-family:'IBM Plex Mono',monospace;font-size:0.65rem;font-weight:600;color:var(--gray-3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+  .fact-item{display:flex;gap:10px;margin-bottom:7px;font-size:0.83rem;color:var(--gray-1);align-items:flex-start;}
+  .fact-bullet{width:6px;height:6px;background:var(--red);border-radius:50%;margin-top:6px;flex-shrink:0;}
+  .actor-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .actor-card{border:1.5px solid var(--gray-4);border-radius:5px;padding:10px 12px;}
+  .actor-card.ally{border-color:var(--green);background:var(--green-light);}
+  .actor-card.opponent{border-color:var(--red);background:#fadbd8;}
+  .actor-card.neutral{border-color:var(--gold);background:var(--gold-light);}
+  .actor-type{font-family:'IBM Plex Mono',monospace;font-size:0.62rem;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;}
+  .actor-type.ally{color:var(--green);}.actor-type.opponent{color:var(--red-dark);}.actor-type.neutral{color:var(--gold);}
+  .actor-name{font-weight:600;font-size:0.82rem;color:var(--black);}
+  .actor-desc{font-size:0.75rem;color:var(--gray-2);margin-top:3px;}
+  .headline-item{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--gray-5);align-items:flex-start;cursor:pointer;}
+  .headline-item:last-child{border-bottom:none;}
+  .headline-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+  .headline-text{flex:1;}
+  .headline-title{font-weight:600;font-size:0.83rem;color:var(--black);line-height:1.35;}
+  .headline-meta{font-size:0.72rem;color:var(--gray-3);margin-top:2px;font-family:'IBM Plex Mono',monospace;}
+  .headline-arrow{color:var(--gray-4);font-size:0.8rem;margin-top:3px;}
+  #right-ladder{background:var(--black);height:100%;overflow:hidden;display:flex;flex-direction:column;}
+  .ladder-header{background:var(--black);padding:10px 12px 8px;border-bottom:2px solid var(--gold);flex-shrink:0;}
+  .ladder-header-title{font-family:'IBM Plex Serif',serif;font-size:0.85rem;font-weight:700;color:var(--white);}
+  .ladder-header-sub{font-size:0.65rem;color:rgba(255,255,255,0.4);margin-top:2px;font-family:'IBM Plex Mono',monospace;}
+  .ladder-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column-reverse;padding:8px;gap:5px;scrollbar-width:thin;}
+  .rung{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:5px;cursor:pointer;overflow:hidden;}
+  .rung:hover{background:rgba(255,255,255,0.09);}
+  .rung.open{border-color:var(--gold);}
+  .rung-top{display:flex;align-items:center;gap:7px;padding:7px 9px;}
+  .rung-num{font-family:'IBM Plex Mono',monospace;font-size:0.65rem;font-weight:600;color:var(--gold);width:18px;flex-shrink:0;text-align:right;}
+  .rung-icon{font-size:0.9rem;flex-shrink:0;}
+  .rung-label{font-size:0.75rem;font-weight:600;color:var(--white);flex:1;line-height:1.3;}
+  .rung-chevron{font-size:0.6rem;color:rgba(255,255,255,0.3);transition:transform 0.2s;flex-shrink:0;}
+  .rung.open .rung-chevron{transform:rotate(180deg);color:var(--gold);}
+  .rung-detail{display:none;padding:8px 9px 10px 34px;font-size:0.73rem;color:rgba(255,255,255,0.6);line-height:1.55;border-top:1px solid rgba(255,255,255,0.07);max-height:160px;overflow-y:auto;}
+  .rung.open .rung-detail{display:block;}
+  .rung-members{font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--gold);margin-top:6px;}
+  .rung-action{display:inline-block;margin-top:7px;font-size:0.68rem;font-weight:600;color:var(--gold);border:1px solid rgba(183,149,11,0.4);padding:2px 8px;border-radius:3px;}
+  .rung[data-level="low"]{border-left:3px solid var(--green);}
+  .rung[data-level="med"]{border-left:3px solid var(--gold);}
+  .rung[data-level="high"]{border-left:3px solid var(--red);}
+</style>
+</head>
+<body>
+<div id="topbar">
+  <div class="logo">A <span>Shadow</span> Government</div>
+  <span class="issue-label">Issue Working Group</span>
+  <div class="issue-title">${esc(d.emoji)} ${esc(d.name)}</div>
+  <div class="topbar-stat">${esc(d.members)} members · ${esc(d.campaigns)} campaigns</div>
+</div>
+<div id="layout">
+  <nav id="left-nav">
+    <div class="nav-army-box">
+      <div class="label">Army Status</div>
+      <div class="nav-army-row"><span>Members</span><span class="num">4,219</span></div>
+      <div class="nav-army-row"><span>Campaigns</span><span class="num">47</span></div>
+      <div class="nav-army-row"><span>This week</span><span class="num">847 acts</span></div>
+    </div>
+    <div class="nav-section-label">Main</div>
+    <a class="nav-item" href="shadow_government_demo.html"><span class="nav-icon">🏠</span> Home</a>
+    <a class="nav-item" href="#"><span class="nav-icon">📊</span> Rep Scorecard</a>
+    <a class="nav-item" href="#"><span class="nav-icon">🚨</span> Take Action</a>
+    <a class="nav-item" href="#"><span class="nav-icon">⚔️</span> Our Army</a>
+    <div class="nav-divider"></div>
+    <div class="nav-section-label">Issues</div>
+    <a class="nav-item active" href="#"><span class="nav-icon">${esc(d.emoji)}</span> ${esc(d.name)}</a>
+    <a class="nav-item" href="#"><span class="nav-icon">🗳️</span> Voting Rights</a>
+    <a class="nav-item" href="#"><span class="nav-icon">⚖️</span> Rule of Law</a>
+    <a class="nav-item" href="#"><span class="nav-icon">🏥</span> Healthcare</a>
+    <a class="nav-item" href="#"><span class="nav-icon">🌍</span> Climate</a>
+    <a class="nav-item" href="#"><span class="nav-icon">💰</span> Econ. Justice</a>
+    <a class="nav-item" href="#"><span class="nav-icon">🏛️</span> Dark Money</a>
+    <div class="nav-divider"></div>
+    <div class="nav-section-label">Learn</div>
+    <a class="nav-item" href="#"><span class="nav-icon">🪜</span> Participation Ladder</a>
+    <a class="nav-item" href="#"><span class="nav-icon">📚</span> Citizenship Skills</a>
+    <a class="nav-item" href="#"><span class="nav-icon">📜</span> Social Contract</a>
+  </nav>
+
+  <div id="middle">
+    <div class="middle-box" id="box-issue">
+      <div class="box-header">
+        <span class="box-header-icon">❓</span>
+        <span class="box-header-title">So what's the issue?</span>
+        <span class="box-header-tag">BRIEFING</span>
+      </div>
+      <div class="box-body">
+        <div class="issue-summary">${esc(d.summary) || 'Summary coming soon.'}</div>
+        <div class="issue-body">
+${paras || '          <p>Briefing in progress.</p>'}
+        </div>
+        ${factsHTML ? `<div class="key-facts"><div class="key-facts-title">Key Facts</div>${factsHTML}</div>` : ''}
+      </div>
+    </div>
+
+    <div class="middle-box" id="box-who">
+      <div class="box-header">
+        <span class="box-header-icon">👥</span>
+        <span class="box-header-title">Who's involved?</span>
+        <span class="box-header-tag">PLAYERS</span>
+      </div>
+      <div class="box-body">
+        <div class="actor-grid">
+          ${actorsHTML || '<p style="color:var(--gray-3);font-size:0.85rem;">Players to be added.</p>'}
+        </div>
+      </div>
+    </div>
+
+    <div class="middle-box" id="box-now">
+      <div class="box-header">
+        <span class="box-header-icon">⚡</span>
+        <span class="box-header-title">What's happening right now?</span>
+        <span class="box-header-tag">LIVE FEED</span>
+      </div>
+      <div class="box-body">
+        ${headlinesHTML || '<p style="color:var(--gray-3);font-size:0.85rem;">Headlines to be added.</p>'}
+      </div>
+    </div>
+  </div>
+
+  <div id="right-ladder">
+    <div class="ladder-header">
+      <div class="ladder-header-title">🪜 Participation Ladder</div>
+      <div class="ladder-header-sub">BOTTOM = START · TOP = FULLEST COMMITMENT</div>
+    </div>
+    <div class="ladder-scroll">
+      <div class="rung" data-level="low" onclick="toggleRung(this)"><div class="rung-top"><span class="rung-num">1</span><span class="rung-icon">📰</span><span class="rung-label">Stay Informed</span><span class="rung-chevron">▼</span></div><div class="rung-detail">Read the weekly briefing. Follow the news feed. Know what's happening and tell others.<div class="rung-members">1,847 members here</div><div class="rung-action">Join this rung →</div></div></div>
+      <div class="rung" data-level="low" onclick="toggleRung(this)"><div class="rung-top"><span class="rung-num">2</span><span class="rung-icon">💬</span><span class="rung-label">Have Conversations</span><span class="rung-chevron">▼</span></div><div class="rung-detail">Talk to family, friends, neighbors. Don't let bad information go unchallenged.<div class="rung-members">1,203 members here</div><div class="rung-action">Join this rung →</div></div></div>
+      <div class="rung" data-level="low" onclick="toggleRung(this)"><div class="rung-top"><span class="rung-num">3</span><span class="rung-icon">✍️</span><span class="rung-label">Contact Reps</span><span class="rung-chevron">▼</span></div><div class="rung-detail">Call, write, email your elected officials. Use our templates or write your own.<div class="rung-members">987 members here</div><div class="rung-action">Use a template →</div></div></div>
+      <div class="rung" data-level="low" onclick="toggleRung(this)"><div class="rung-top"><span class="rung-num">4</span><span class="rung-icon">📢</span><span class="rung-label">Amplify</span><span class="rung-chevron">▼</span></div><div class="rung-detail">Share campaigns on social media. Write letters to local papers. Be a signal, not noise.<div class="rung-members">743 members here</div><div class="rung-action">Join this rung →</div></div></div>
+      <div class="rung" data-level="med" onclick="toggleRung(this)"><div class="rung-top"><span class="rung-num">5</span><span class="rung-icon">🏛️</span><span class="rung-label">Attend Public Meetings</span><span class="rung-chevron">▼</span></div><div class="rung-detail">Town halls, school board, city council. Physical presence is political power. Bring a friend.<div class="rung-members">521 members here</div><div class="rung-action">Find a meeting →</div></div></div>
+      <div class="rung" data-level="med" onclick="toggleRung(this)"><div class="rung-top"><span class="rung-num">6</span><span class="rung-icon">🗳️</span><span class="rung-label">Voter Registration</span><span class="rung-chevron">▼</span></div><div class="rung-detail">Register voters. Drive people to polls. Help with absentee ballots. The most undervalued work.<div class="rung-members">412 members here</div><div class="rung-action">Get trained →</div></div></div>
+      <div class="rung" data-level="med" onclick="toggleRung(this)"><div class="rung-top"><span class="rung-num">7</span><span class="rung-icon">🤝</span><span class="rung-label">Join a Working Group</span><span class="rung-chevron">▼</span></div><div class="rung-detail">Become a specialist. Coordinate with others. Share research. Plan and execute campaigns.<div class="rung-members">298 members here</div><div class="rung-action">Join this working group →</div></div></div>
+      <div class="rung" data-level="med" onclick="toggleRung(this)"><div class="rung-top"><span class="rung-num">8</span><span class="rung-icon">📣</span><span class="rung-label">Organize Locally</span><span class="rung-chevron">▼</span></div><div class="rung-detail">Build a local chapter. Recruit neighbors. Hold your own community meetings.<div class="rung-members">187 members here</div><div class="rung-action">Start a chapter →</div></div></div>
+      <div class="rung" data-level="high" onclick="toggleRung(this)"><div class="rung-top"><span class="rung-num">9</span><span class="rung-icon">🪧</span><span class="rung-label">Public Demonstration</span><span class="rung-chevron">▼</span></div><div class="rung-detail">Marches, rallies, vigils. Visible collective action changes the political weather.<div class="rung-members">143 members here</div><div class="rung-action">Find an event →</div></div></div>
+      <div class="rung" data-level="high" onclick="toggleRung(this)"><div class="rung-top"><span class="rung-num">10</span><span class="rung-icon">💸</span><span class="rung-label">Economic Action</span><span class="rung-chevron">▼</span></div><div class="rung-detail">Boycotts. Targeted purchasing. Where you spend is where you vote, every day.<div class="rung-members">98 members here</div><div class="rung-action">See active boycotts →</div></div></div>
+      <div class="rung" data-level="high" onclick="toggleRung(this)"><div class="rung-top"><span class="rung-num">11</span><span class="rung-icon">✊</span><span class="rung-label">Strike / Withdrawal</span><span class="rung-chevron">▼</span></div><div class="rung-detail">The ultimate expression of collective power. Reserved for when other means are exhausted. Gene Sharp methods 183–198.<div class="rung-members">34 members prepared</div><div class="rung-action">Learn more →</div></div></div>
+    </div>
+  </div>
+</div>
+<script>
+function toggleRung(el){const o=el.classList.contains('open');document.querySelectorAll('.rung').forEach(r=>r.classList.remove('open'));if(!o)el.classList.add('open');}
+<\/script>
+</body>
+</html>`;
+
+  // Trigger download
+  const blob = new Blob([html], { type: 'text/html' });
+  const url  = URL.createObjectURL(blob);
+  const filename = (d.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') || 'issue') + '.html';
+
+  const link = document.getElementById('download-link');
+  link.href = url;
+  link.download = filename;
+
+  document.getElementById('download-wrap').style.display = 'block';
+  document.getElementById('download-wrap').scrollIntoView({ behavior: 'smooth' });
+  link.click(); // auto-trigger download
+}
+
+function esc(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function resetForm() {
+  location.reload();
+}
+</script>
+</body>
+</html>
