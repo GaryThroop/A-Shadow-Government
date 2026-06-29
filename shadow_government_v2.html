@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Shadow Government — Interactive Demo</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#ffffff;--bg2:#f5f5f3;--bg3:#efefec;
+  --text:#1a1a18;--text2:#5a5a56;--text3:#909088;
+  --border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.22);
+  --blue:#185FA5;--blue-bg:#E6F1FB;--blue-dark:#0C447C;
+  --green:#3B6D11;--green-bg:#EAF3DE;--green-dark:#27500A;
+  --amber:#BA7517;--amber-bg:#FAEEDA;--amber-dark:#633806;
+  --red:#A32D2D;--red-bg:#FCEBEB;--red-dark:#791F1F;
+  --purple:#534AB7;--purple-bg:#EEEDFE;
+  --r:8px;--rlg:12px;
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+}
+body{font-family:var(--font);background:var(--bg3);color:var(--text);font-size:14px;line-height:1.6;}
+
+/* DEMO BANNER */
+.demo-banner{background:var(--purple-bg);border-bottom:1px solid #AFA9EC;padding:8px 20px;text-align:center;font-size:12px;color:var(--purple);display:flex;align-items:center;justify-content:center;gap:10px;}
+.demo-banner strong{font-weight:600;}
+
+/* LAYOUT */
+.shell{display:flex;min-height:calc(100vh - 36px);max-width:1140px;margin:0 auto;}
+
+/* SIDEBAR */
+.sidebar{width:218px;min-width:218px;background:var(--bg);border-right:0.5px solid var(--border);display:flex;flex-direction:column;}
+.logo-area{padding:14px 16px 12px;border-bottom:0.5px solid var(--border);}
+.logo-name{font-size:14px;font-weight:700;color:var(--text);letter-spacing:-.01em;}
+.logo-sub{font-size:10px;color:var(--text3);margin-top:2px;line-height:1.4;font-style:italic;}
+.army-widget{margin:8px;background:var(--bg2);border-radius:var(--r);padding:10px 12px;}
+.aw-row{display:flex;justify-content:space-between;font-size:11px;padding:2px 0;}
+.aw-label{color:var(--text2);}
+.aw-num{font-weight:600;color:var(--text);}
+.aw-live{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--green);margin-top:5px;}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.nav-sec{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);padding:10px 16px 3px;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 16px;font-size:13px;color:var(--text2);cursor:pointer;border-left:2px solid transparent;transition:all .1s;}
+.nav-item:hover{background:var(--bg2);color:var(--text);}
+.nav-item.active{color:var(--blue);border-left-color:var(--blue);background:var(--blue-bg);font-weight:500;}
+.nav-item i{font-size:16px;}
+.nav-badge{font-size:10px;background:var(--red);color:white;border-radius:99px;padding:1px 6px;margin-left:auto;}
+.sidebar-footer{padding:12px 14px;border-top:0.5px solid var(--border);margin-top:auto;font-size:11px;color:var(--text3);line-height:1.6;}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;}
+.topbar{background:var(--bg);border-bottom:0.5px solid var(--border);padding:9px 20px;display:flex;align-items:center;gap:10px;}
+.search{display:flex;align-items:center;gap:7px;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:7px 12px;flex:1;max-width:360px;font-size:13px;color:var(--text2);}
+.topbar-right{margin-left:auto;display:flex;gap:8px;}
+.btn{padding:7px 14px;border-radius:var(--r);font-size:13px;cursor:pointer;border:0.5px solid var(--border2);background:var(--bg);color:var(--text2);font-family:var(--font);}
+.btn:hover{background:var(--bg2);}
+.btn-primary{background:var(--blue);color:white;border-color:var(--blue);font-weight:500;}
+.btn-primary:hover{background:var(--blue-dark);}
+.btn-green{background:var(--green);color:white;border-color:var(--green);}
+.btn-green:hover{background:var(--green-dark);}
+.btn-red{background:var(--red);color:white;border-color:var(--red);}
+.content{flex:1;padding:18px 20px 40px;overflow-y:auto;}
+
+/* PAGE SYSTEM */
+.page{display:none;}
+.page.active{display:block;}
+
+/* CARDS */
+.card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--rlg);padding:16px 20px;margin-bottom:12px;}
+.card-blue{border-left:3px solid var(--blue);border-radius:0 var(--rlg) var(--rlg) 0;}
+.card-red{border-left:3px solid var(--red);border-radius:0 var(--rlg) var(--rlg) 0;}
+.card-green{border-left:3px solid var(--green);border-radius:0 var(--rlg) var(--rlg) 0;}
+.card-amber{border-left:3px solid var(--amber);border-radius:0 var(--rlg) var(--rlg) 0;}
+.sec-label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;}
+.h1{font-size:20px;font-weight:700;color:var(--text);margin-bottom:6px;line-height:1.3;}
+.h2{font-size:16px;font-weight:600;color:var(--text);margin-bottom:8px;}
+.h3{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px;}
+.body-text{font-size:13px;color:var(--text2);line-height:1.75;}
+
+/* TABS */
+.tabs{display:flex;border-bottom:0.5px solid var(--border);background:var(--bg);border-radius:var(--rlg) var(--rlg) 0 0;padding:0 14px;overflow-x:auto;}
+.tab{padding:10px 12px;font-size:13px;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--font);}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:500;}
+.tab-content{background:var(--bg);border:0.5px solid var(--border);border-top:none;border-radius:0 0 var(--rlg) var(--rlg);padding:16px;margin-bottom:12px;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* URGENCY */
+.urgency-bar{background:var(--red-bg);border:0.5px solid #F7C1C1;border-left:3px solid var(--red);border-radius:0 var(--rlg) var(--rlg) 0;padding:14px 18px;margin-bottom:12px;}
+.ub-label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin-bottom:5px;}
+.ub-title{font-size:15px;font-weight:600;color:var(--red-dark);margin-bottom:5px;}
+.ub-body{font-size:13px;color:var(--red-dark);line-height:1.6;}
+
+/* ACTION TOOLS */
+.action-tool{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--rlg);padding:0;margin-bottom:10px;overflow:hidden;}
+.at-header{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;background:var(--bg);}
+.at-icon{font-size:18px;flex-shrink:0;}
+.at-title{font-size:14px;font-weight:600;color:var(--text);flex:1;}
+.at-desc{font-size:12px;color:var(--text2);}
+.at-effort{font-size:11px;padding:2px 8px;border-radius:99px;flex-shrink:0;}
+.ef-2{background:var(--green-bg);color:var(--green-dark);}
+.ef-5{background:var(--blue-bg);color:var(--blue-dark);}
+.ef-10{background:var(--amber-bg);color:var(--amber-dark);}
+.at-body{padding:0 16px 16px;display:none;}
+.at-body.open{display:block;}
+.at-chevron{font-size:16px;color:var(--text3);transition:transform .2s;}
+.at-chevron.open{transform:rotate(180deg);}
+
+/* GOV FINDER */
+.gov-finder{background:var(--blue-bg);border:0.5px solid #B5D4F4;border-radius:var(--rlg);padding:16px 20px;margin-bottom:14px;}
+.gf-title{font-size:14px;font-weight:600;color:var(--blue-dark);margin-bottom:5px;}
+.gf-sub{font-size:12px;color:var(--blue);margin-bottom:12px;}
+.gf-row{display:flex;gap:8px;flex-wrap:wrap;}
+.gf-input{flex:1;min-width:120px;max-width:200px;padding:8px 12px;font-size:13px;border:0.5px solid #B5D4F4;border-radius:var(--r);font-family:var(--font);background:white;}
+.gov-result{margin-top:12px;display:none;}
+.gov-card{background:white;border:0.5px solid #B5D4F4;border-radius:var(--r);padding:14px 16px;}
+.gov-name{font-size:15px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.gov-state{font-size:12px;color:var(--text2);margin-bottom:10px;}
+.gov-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.gov-contact-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);}
+.gov-contact-item i{font-size:14px;color:var(--text3);}
+.party-d{color:var(--blue);font-weight:600;}
+.party-r{color:var(--red);font-weight:600;}
+
+/* LETTER EDITOR */
+.letter-box{background:white;border:0.5px solid var(--border2);border-radius:var(--r);padding:0;font-family:'Georgia',serif;overflow:hidden;}
+.letter-toolbar{background:var(--bg2);border-bottom:0.5px solid var(--border);padding:8px 12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.lt-btn{font-size:12px;padding:4px 10px;border-radius:var(--r);cursor:pointer;border:0.5px solid var(--border2);background:white;color:var(--text2);font-family:var(--font);}
+.lt-btn:hover{background:var(--bg2);}
+.letter-content{padding:20px 24px;min-height:280px;font-size:13px;line-height:1.8;color:var(--text);outline:none;}
+.letter-content[contenteditable="true"]:focus{background:#FFFEF8;}
+.letter-footer{background:var(--bg2);border-top:0.5px solid var(--border);padding:10px 12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.letter-note{font-size:11px;color:var(--text3);flex:1;}
+
+/* PHONE SCRIPT */
+.script-box{background:white;border:0.5px solid var(--border2);border-radius:var(--r);overflow:hidden;}
+.script-header{background:var(--green-bg);padding:10px 14px;border-bottom:0.5px solid #C0DD97;}
+.script-header h4{font-size:13px;font-weight:600;color:var(--green-dark);}
+.script-content{padding:16px;}
+.script-line{margin-bottom:10px;}
+.script-role{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;margin-bottom:3px;}
+.script-you{color:var(--blue);}
+.script-them{color:var(--text3);}
+.script-text{font-size:13px;color:var(--text);line-height:1.6;background:var(--bg2);padding:10px 12px;border-radius:var(--r);border-left:2px solid var(--green);}
+.script-them-text{border-left-color:var(--border2);}
+.script-note{font-size:11px;color:var(--text3);font-style:italic;margin-top:4px;}
+
+/* ARTICLE */
+.article-body{font-size:14px;line-height:1.85;color:var(--text);}
+.article-body p{margin-bottom:14px;}
+.article-body strong{font-weight:600;}
+.article-byline{font-size:12px;color:var(--text3);margin-bottom:16px;padding-bottom:12px;border-bottom:0.5px solid var(--border);}
+.article-source{background:var(--bg2);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--text2);margin-top:14px;display:flex;align-items:center;gap:8px;}
+
+/* ISSUE GRID */
+.issue-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:10px;margin-bottom:14px;}
+.issue-card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--rlg);padding:14px;cursor:pointer;transition:all .12s;position:relative;}
+.issue-card:hover{border-color:var(--border2);background:var(--bg2);}
+.issue-card.selected{border-color:var(--blue);background:var(--blue-bg);}
+.issue-card.featured{border-color:var(--red);border-width:1.5px;}
+.issue-icon{font-size:20px;color:var(--text3);margin-bottom:8px;}
+.issue-card.selected .issue-icon{color:var(--blue);}
+.issue-card.featured .issue-icon{color:var(--red);}
+.issue-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;line-height:1.3;}
+.issue-meta{font-size:11px;color:var(--text3);line-height:1.4;}
+.issue-hot{position:absolute;top:8px;right:8px;font-size:9px;background:var(--red);color:white;border-radius:99px;padding:1px 6px;font-weight:600;}
+.add-card{background:var(--bg2);border:0.5px dashed var(--border2);border-radius:var(--rlg);padding:14px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:90px;text-align:center;transition:all .12s;}
+.add-card:hover{border-color:var(--blue);}
+
+/* LADDER */
+.ladder-step{display:flex;gap:12px;padding:11px 0;border-bottom:0.5px solid var(--border);cursor:pointer;}
+.ladder-step:last-child{border-bottom:none;}
+.ladder-step.my-level{background:var(--blue-bg);margin:0 -8px;padding:11px 8px;border-radius:var(--r);border-bottom:none;margin-bottom:2px;}
+.step-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;}
+.sn-low{background:var(--green-bg);color:var(--green-dark);}
+.sn-mid{background:var(--blue-bg);color:var(--blue-dark);}
+.sn-high{background:var(--amber-bg);color:var(--amber-dark);}
+.sn-bold{background:var(--red-bg);color:var(--red-dark);}
+.sn-mine{background:var(--blue);color:white;}
+.step-body{flex:1;}
+.step-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px;}
+.step-desc{font-size:12px;color:var(--text2);line-height:1.5;}
+.mine-tag{font-size:10px;background:var(--blue);color:white;border-radius:99px;padding:1px 6px;margin-left:6px;}
+.exp-pill{font-size:10px;padding:1px 7px;border-radius:99px;margin-left:4px;}
+.exp-none{background:var(--green-bg);color:var(--green-dark);}
+.exp-low{background:var(--blue-bg);color:var(--blue-dark);}
+.exp-med{background:var(--amber-bg);color:var(--amber-dark);}
+.exp-high{background:var(--red-bg);color:var(--red-dark);}
+
+/* BACK BTN */
+.back-btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);cursor:pointer;background:none;border:none;padding:0 0 12px;font-family:var(--font);}
+.back-btn:hover{color:var(--text);}
+
+/* MISC */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.tag{background:var(--bg2);border:0.5px solid var(--border);border-radius:99px;padding:2px 10px;font-size:11px;color:var(--text2);}
+.tag-blue{background:var(--blue-bg);color:var(--blue-dark);border-color:#B5D4F4;}
+.tag-red{background:var(--red-bg);color:var(--red-dark);border-color:#F7C1C1;}
+.tag-green{background:var(--green-bg);color:var(--green-dark);border-color:#C0DD97;}
+
+@media(max-width:720px){
+  .sidebar{display:none;}
+  .two-col{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="demo-banner">
+  <strong>A Shadow Government</strong> — Interactive prototype · Click any nav item, tab, or button to explore
+</div>
+
+<div class="shell">
+
+<!-- ===================== SIDEBAR ===================== -->
+<nav class="sidebar">
+  <div class="logo-area">
+    <div class="logo-name">A Shadow Government</div>
+    <div class="logo-sub">"Government of the people,<br>by the people, and for the people"</div>
+  </div>
+
+  <div class="army-widget">
+    <div class="sec-label" style="margin-bottom:5px;">The people's army</div>
+    <div class="aw-row"><span class="aw-label">Active today</span><span class="aw-num">14,882</span></div>
+    <div class="aw-row"><span class="aw-label">Actions taken</span><span class="aw-num">5,341</span></div>
+    <div class="aw-row"><span class="aw-label">Issues covered</span><span class="aw-num">31 of 31</span></div>
+    <div class="aw-row"><span class="aw-label">Wins this month</span><span class="aw-num" style="color:var(--green);">27</span></div>
+    <div class="aw-live"><div class="pulse"></div>Live · updated every 15 min</div>
+  </div>
+
+  <div class="nav-sec">Act now</div>
+  <div class="nav-item active" onclick="nav('home',this)"><i class="ti ti-home"></i>Home</div>
+  <div class="nav-item" onclick="nav('action',this)"><i class="ti ti-bolt"></i>Featured action <span class="nav-badge">URGENT</span></div>
+  <div class="nav-item" onclick="nav('govfinder',this)"><i class="ti ti-map-pin"></i>Find your governor</div>
+
+  <div class="nav-sec">Organize</div>
+  <div class="nav-item" onclick="nav('issues',this)"><i class="ti ti-list-check"></i>All issues</div>
+  <div class="nav-item" onclick="nav('government',this)"><i class="ti ti-building-bank"></i>Your representatives</div>
+  <div class="nav-item" onclick="nav('army',this)"><i class="ti ti-users"></i>The whole picture</div>
+
+  <div class="nav-sec">Research</div>
+  <div class="nav-item" onclick="nav('research',this)"><i class="ti ti-database"></i>WikiGovernment</div>
+  <div class="nav-item" onclick="nav('actions',this)"><i class="ti ti-list-check"></i>198 Actions</div>
+
+  <div class="nav-sec">Learn</div>
+  <div class="nav-item" onclick="nav('skills',this)"><i class="ti ti-school"></i>Citizenship skills</div>
+  <div class="nav-item" onclick="nav('contract',this)"><i class="ti ti-writing"></i>Social contract</div>
+  <div class="nav-item" onclick="nav('ladder',this)"><i class="ti ti-stairs"></i>How you help</div>
+
+  <div class="nav-sec">You</div>
+  <div class="nav-item" onclick="nav('dashboard',this)"><i class="ti ti-user-circle"></i>My dashboard</div>
+  <div class="nav-item" onclick="nav('orientation',this)"><i class="ti ti-info-circle"></i>Orientation</div>
+
+  <div class="sidebar-footer">
+    Name candidates:<br>
+    · A Shadow Government ✓<br>
+    · The People's Hub<br>
+    · We Are the Many<br>
+    · Common Ground
+  </div>
+</nav>
+
+<!-- ===================== MAIN ===================== -->
+<div class="main">
+  <div class="topbar">
+    <div class="search"><i class="ti ti-search" style="font-size:14px;"></i>Search issues, reps, actions...</div>
+    <div class="topbar-right">
+      <button class="btn">Sign in</button>
+      <button class="btn btn-primary">Join the effort</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ===== HOME ===== -->
+    <div class="page active" id="page-home">
+      <div class="card card-blue" style="margin-bottom:14px;">
+        <div class="h1">A Shadow Government</div>
+        <div style="font-size:15px;font-style:italic;color:var(--text2);margin-bottom:12px;">"Government of the people, by the people, and for the people"</div>
+        <div class="body-text">The federal government's tools for self-correction are broken. But the United States is not just one government — it is hundreds of independent governments, fifty of them dual sovereigns with their own courts, prosecutors, and constitutions.<br><br>This site exists to organize the people who understand that, connect them across every issue that matters, and make effective action as easy as possible for everyone — whatever their level of involvement.</div>
+        <div style="background:var(--bg2);border-left:3px solid var(--blue);border-radius:0 var(--r) var(--r) 0;padding:12px 14px;margin:14px 0;font-size:13px;color:var(--text2);font-style:italic;line-height:1.7;">
+          "Why are we losing when there are so many more of us? Because they're specialized and we're not. They fund people whose entire job is one thing: pack the courts, roll back climate rules, control the media. We try to fight all of it at once and burn out.<br><br><strong style="color:var(--text);">This site works differently. Pick your issue. Work with others on that issue. Let the rest of us handle the rest.</strong>"
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-red" onclick="nav('action',document.querySelectorAll('.nav-item')[1])">See the urgent action now →</button>
+          <button class="btn btn-primary" onclick="nav('orientation',null)">How this works →</button>
+          <button class="btn" onclick="nav('issues',null)">Browse all issues</button>
+        </div>
+      </div>
+
+      <div class="urgency-bar">
+        <div class="ub-label"><i class="ti ti-alert-triangle"></i> Featured action — urgent</div>
+        <div class="ub-title">Contact your governor: demand a state of emergency declaration</div>
+        <div class="ub-body">Twenty-four governors have the power to act right now. The tools are being left unused. Christopher Armitage makes the case — and we make it easy to act on it. Letter, email, and phone script ready. Takes five minutes.</div>
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-red" onclick="nav('action',document.querySelectorAll('.nav-item')[1])">Take action now — 5 minutes →</button>
+          <button class="btn" onclick="nav('govfinder',null)">Find your governor first</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== FEATURED ACTION MODULE ===== -->
+    <div class="page" id="page-action">
+      <button class="back-btn" onclick="nav('home',document.querySelectorAll('.nav-item')[0])"><i class="ti ti-arrow-left"></i>Back to home</button>
+
+      <!-- MODULE HEADER -->
+      <div class="card card-red" style="margin-bottom:12px;">
+        <div class="sec-label" style="color:var(--red);">Featured action · State sovereignty</div>
+        <div class="h1">Demand your governor declare a state of emergency</div>
+        <div class="body-text" style="margin-bottom:12px;">The federal tools for accountability are broken. The answer the founders built is in every state capital. Twenty-four governors can act — right now — without waiting for Congress or the courts. This is the moment to tell them we need them to.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="tag tag-red"><i class="ti ti-clock" style="font-size:12px;vertical-align:-1px;margin-right:3px;"></i>5 minutes</span>
+          <span class="tag">State sovereignty</span>
+          <span class="tag">Constitutional governance</span>
+          <span class="tag">Epstein accountability</span>
+        </div>
+      </div>
+
+      <!-- ACTION TOOLS - THE HEART OF THE MODULE -->
+      <div class="card" style="margin-bottom:12px;">
+        <div class="h2"><i class="ti ti-bolt" style="color:var(--red);margin-right:6px;"></i>What you can do right now</div>
+        <div class="body-text" style="margin-bottom:14px;">Three ways to act — pick one, or do all three. Every contact matters. We need governors receiving thousands of these messages.</div>
+
+        <!-- GOV FINDER EMBEDDED -->
+        <div class="gov-finder" style="margin-bottom:14px;">
+          <div class="gf-title"><i class="ti ti-map-pin" style="margin-right:5px;"></i>Step 1 — Find your governor</div>
+          <div class="gf-sub">Enter your state abbreviation or zip code to get your governor's contact information pre-filled into every template below.</div>
+          <div class="gf-row">
+            <input class="gf-input" id="state-input" placeholder="e.g. NY, CA, TX, WA..." maxlength="10" oninput="this.value=this.value.toUpperCase()">
+            <button class="btn btn-primary" onclick="findGov()"><i class="ti ti-search" style="font-size:13px;margin-right:4px;"></i>Find my governor</button>
+          </div>
+          <div class="gov-result" id="gov-result">
+            <div class="gov-card">
+              <div style="display:flex;align-items:flex-start;gap:12px;">
+                <div style="width:40px;height:40px;border-radius:50%;background:var(--blue-bg);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--blue-dark);flex-shrink:0;" id="gov-initials">KH</div>
+                <div style="flex:1;">
+                  <div class="gov-name" id="gov-name">Gov. Kathy Hochul</div>
+                  <div class="gov-state" id="gov-state">Governor of New York · <span id="gov-party" class="party-d">Democrat</span></div>
+                  <div class="gov-contact-item" id="gov-phone-row"><i class="ti ti-phone"></i><span id="gov-phone">(518) 474-8390</span></div>
+                  <div class="gov-contact-item" style="margin-top:4px;"><i class="ti ti-external-link"></i><a id="gov-link" href="#" style="color:var(--blue);font-size:12px;" target="_blank">Contact form</a></div>
+                  <div class="gov-actions">
+                    <button class="btn btn-primary" onclick="scrollToLetter()"><i class="ti ti-file-text" style="font-size:13px;margin-right:3px;"></i>Use the letter template</button>
+                    <button class="btn btn-green" onclick="openTab('tab-phone',document.querySelectorAll('.tab')[2])"><i class="ti ti-phone" style="font-size:13px;margin-right:3px;"></i>Call script</button>
+                  </div>
+                </div>
+              </div>
+              <div id="gov-note" style="display:none;margin-top:10px;padding:8px 12px;border-radius:var(--r);font-size:12px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACTION TABS -->
+        <div class="tabs">
+          <button class="tab active" onclick="openTab('tab-letter',this)"><i class="ti ti-file-text" style="font-size:13px;margin-right:4px;"></i>Letter / contact form</button>
+          <button class="tab" onclick="openTab('tab-email',this)"><i class="ti ti-mail" style="font-size:13px;margin-right:4px;"></i>Email template</button>
+          <button class="tab" onclick="openTab('tab-phone',this)"><i class="ti ti-phone" style="font-size:13px;margin-right:4px;"></i>Phone script</button>
+          <button class="tab" onclick="openTab('tab-share',this)"><i class="ti ti-share" style="font-size:13px;margin-right:4px;"></i>Share &amp; amplify</button>
+        </div>
+        <div class="tab-content">
+
+          <!-- LETTER TAB -->
+          <div class="tab-panel active" id="tab-letter">
+            <div style="font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.6;">This is the letter Christopher Armitage sent to Governor Ferguson, adapted for your governor. <strong>Edit it to make it yours</strong> — personalize it, add your own concerns, make it sound like you. A personal letter is far more powerful than a form letter.</div>
+            <div class="letter-box" id="letter-anchor">
+              <div class="letter-toolbar">
+                <button class="lt-btn" onclick="copyLetter()"><i class="ti ti-copy" style="font-size:13px;vertical-align:-2px;margin-right:3px;"></i>Copy all</button>
+                <button class="lt-btn" onclick="printLetter()"><i class="ti ti-printer" style="font-size:13px;vertical-align:-2px;margin-right:3px;"></i>Print</button>
+                <button class="lt-btn" onclick="resetLetter()"><i class="ti ti-refresh" style="font-size:13px;vertical-align:-2px;margin-right:3px;"></i>Reset to original</button>
+                <span style="font-size:11px;color:var(--text3);margin-left:auto;">Click anywhere to edit</span>
+              </div>
+              <div class="letter-content" contenteditable="true" id="letter-content">
+                <p><strong>Governor <span id="letter-gov-name">[Your Governor's Name]</span>,</strong></p>
+                <br>
+                <p>Governor, we are in a state of emergency.</p>
+                <br>
+                <p>The federal government is holding approximately 60,000 people in detention facilities while elected representatives who attempt to inspect them are being barred and arrested. Federal agents have killed American citizens on American streets and concealed their identities. The administration froze $259.5 million in Minnesota's Medicaid funding while over a million people depend on the program. Personal data from 300 million Americans was copied to an unsecured server. The president has called for federal takeover of state elections.</p>
+                <br>
+                <p>The president took the country to war with Iran without congressional authorization.</p>
+                <br>
+                <p>None of these are separate crises. They are connected, and the connections lead to the Epstein files — files that implicate the people driving every crisis on this list. The federal investigation is dead because the investigation leads to the people running the federal government. Your state's criminal code, your state's courts, your state's grand juries, and your state's pardon-proof jurisdiction are the answer the founders built for exactly this situation.</p>
+                <br>
+                <p>Please consider what threshold would merit you declaring a state of emergency. I believe that threshold has been crossed — many times over. We need <span id="letter-state">[Your State]</span> to use the broad, fast authority an emergency declaration provides to aggressively investigate and prosecute the crimes in those files, and to refer evidence to other states when it intersects with their criminal codes.</p>
+                <br>
+                <p>Twenty-four governors acting means twenty-four simultaneous investigations that no pardon can reach. It means the people who drove every crisis we're facing are finally playing defense instead of offense. It means the distraction loses its purpose the moment the thing it was designed to protect is under investigation.</p>
+                <br>
+                <p>I am asking you to pick up the strongest weapon available to you. We need you to act.</p>
+                <br>
+                <p>Respectfully,</p>
+                <p>[Your name]</p>
+                <p>[Your city, <span id="letter-state2">[Your State]</span>]</p>
+              </div>
+              <div class="letter-footer">
+                <span class="letter-note">Tip: Replace [Your name] and [Your city] before sending. Personalize the middle paragraph with your own concerns about your state — it makes a real difference.</span>
+                <button class="btn btn-primary" onclick="copyLetter()">Copy &amp; paste into contact form →</button>
+              </div>
+            </div>
+            <div style="margin-top:10px;padding:10px 14px;background:var(--blue-bg);border-radius:var(--r);font-size:12px;color:var(--blue-dark);">
+              <strong>After copying:</strong> Go to your governor's contact form at <a id="letter-contact-link" href="https://www.usa.gov/state-governor" target="_blank" style="color:var(--blue);">usa.gov/state-governor</a> and paste the letter into the message field.
+            </div>
+          </div>
+
+          <!-- EMAIL TAB -->
+          <div class="tab-panel" id="tab-email">
+            <div style="font-size:13px;color:var(--text2);margin-bottom:12px;">Use this if your governor has a direct email address. Subject line matters — here's one that works:</div>
+            <div style="background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r);padding:12px 14px;margin-bottom:10px;">
+              <div style="font-size:11px;color:var(--text3);margin-bottom:3px;">SUBJECT LINE</div>
+              <div style="font-size:14px;font-weight:500;color:var(--text);" id="email-subject">Requesting Emergency Declaration — State Sovereignty and Constitutional Crisis</div>
+            </div>
+            <div class="letter-box">
+              <div class="letter-toolbar">
+                <button class="lt-btn" onclick="copyEmail()"><i class="ti ti-copy" style="font-size:13px;vertical-align:-2px;margin-right:3px;"></i>Copy email body</button>
+                <button class="lt-btn" onclick="copySubject()"><i class="ti ti-copy" style="font-size:13px;vertical-align:-2px;margin-right:3px;"></i>Copy subject</button>
+              </div>
+              <div class="letter-content" contenteditable="true" id="email-content">
+                <p>Governor <span id="email-gov-name">[Governor's Name]</span>,</p>
+                <br>
+                <p>I'm writing as a constituent of <span id="email-state">[State]</span> to urge you to declare a state of emergency and direct state law enforcement resources toward investigating the Epstein co-conspirators and referring evidence to other states as appropriate.</p>
+                <br>
+                <p>The federal tools for accountability are broken. The DOJ shut down the active investigation. The FBI closed it with a two-page memo claiming no evidence existed. Nearly fifty women gave prosecutors the names of roughly twenty co-conspirators and descriptions of how the operation worked. Every bit of it went nowhere — because the investigation leads to the people running the federal government.</p>
+                <br>
+                <p>Your state's criminal code, courts, and grand juries are beyond the reach of a federal pardon. This is the answer the founders designed. Twenty-four governors acting together means twenty-four simultaneous investigations that no pardon can reach.</p>
+                <br>
+                <p>I am asking you to use the authority you have. The threshold for emergency action has been crossed.</p>
+                <br>
+                <p>Thank you,</p>
+                <p>[Your name]</p>
+                <p>[Your city, <span id="email-state2">[State]</span>]</p>
+              </div>
+              <div class="letter-footer">
+                <span class="letter-note">Shorter and direct. Edit to add your personal connection to the issue.</span>
+                <button class="btn btn-primary" onclick="copyEmail()">Copy email body →</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- PHONE TAB -->
+          <div class="tab-panel" id="tab-phone">
+            <div style="font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.6;">Phone calls are the most impactful single action you can take. Calls are tallied daily. Volume matters. This call takes <strong>2–3 minutes</strong>. The script below handles every response they're likely to give.</div>
+
+            <div style="background:var(--blue-bg);border:0.5px solid #B5D4F4;border-radius:var(--r);padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;">
+              <i class="ti ti-phone" style="font-size:20px;color:var(--blue);flex-shrink:0;"></i>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--blue-dark);">Call: <span id="phone-gov-name">Your Governor's office</span></div>
+                <div style="font-size:14px;font-weight:700;color:var(--blue);" id="phone-number">(Find your governor above to get the number)</div>
+              </div>
+            </div>
+
+            <div class="script-box">
+              <div class="script-header">
+                <h4>Phone script — Governor's office contact</h4>
+              </div>
+              <div class="script-content">
+                <div class="script-line">
+                  <div class="script-role script-them">When they answer:</div>
+                  <div class="script-text script-them-text">"Governor's office, how can I help you?"</div>
+                </div>
+                <div class="script-line">
+                  <div class="script-role script-you">You say:</div>
+                  <div class="script-text">"Hi, my name is [your name] and I'm a constituent calling to urge the Governor to declare a state of emergency in response to the constitutional crisis at the federal level. I'm specifically asking the Governor to consider using the state's investigative authority to pursue accountability for the Epstein co-conspirators, who are connected to the people driving every crisis we're facing right now. Would you be able to log that message for the Governor?"</div>
+                </div>
+                <div class="script-line">
+                  <div class="script-role script-them">If they say "What specifically are you referring to?"</div>
+                  <div class="script-text script-them-text">[They want more detail]</div>
+                  <div class="script-text" style="margin-top:6px;">"The federal DOJ shut down the active Epstein investigation. The FBI closed it with a memo claiming no evidence existed, even though nearly fifty women gave prosecutors names of roughly twenty co-conspirators. The pardon power stops at the state line, and the Governor has authority to act independently. I'm asking them to use it."</div>
+                </div>
+                <div class="script-line">
+                  <div class="script-role script-them">If they say "The Governor supports the federal process"</div>
+                  <div class="script-text script-them-text">[Common deflection]</div>
+                  <div class="script-text" style="margin-top:6px;">"With respect, the federal process was shut down by the people it was supposed to investigate. That's exactly why state action is necessary and appropriate. I'd appreciate you noting that I'm specifically asking for state-level action, not federal."</div>
+                </div>
+                <div class="script-line">
+                  <div class="script-role script-them">If they ask for contact info</div>
+                  <div class="script-text script-them-text">[Optional — you can share or decline]</div>
+                  <div class="script-text" style="margin-top:6px;">Give your name and zip code if comfortable. It helps them log the contact as a constituent. You are not required to give more.</div>
+                </div>
+                <div class="script-line">
+                  <div class="script-role script-you">To close:</div>
+                  <div class="script-text">"Thank you for your time. Please make sure that message reaches the Governor's staff."</div>
+                </div>
+                <div style="background:var(--green-bg);border-radius:var(--r);padding:10px 12px;margin-top:10px;font-size:12px;color:var(--green-dark);">
+                  <strong>After the call:</strong> Report back below — what happened? Did they answer? What did they say? Your report becomes community intelligence for the next caller.
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:12px;">
+              <button class="btn btn-green" onclick="showReportForm()"><i class="ti ti-check" style="font-size:13px;margin-right:4px;"></i>I made the call — report what happened</button>
+            </div>
+            <div id="report-form" style="display:none;margin-top:12px;background:var(--bg2);border-radius:var(--rlg);padding:14px 16px;">
+              <div class="h3">Report back — what happened?</div>
+              <div style="font-size:12px;color:var(--text2);margin-bottom:10px;">Your experience helps the next person calling. Be as specific as you can.</div>
+              <select style="width:100%;font-size:13px;padding:7px 10px;border-radius:var(--r);border:0.5px solid var(--border2);margin-bottom:8px;font-family:var(--font);">
+                <option>Reached a live person and left my message</option>
+                <option>Got voicemail — left a message</option>
+                <option>Line was busy</option>
+                <option>No answer</option>
+                <option>Was transferred to a different office</option>
+              </select>
+              <textarea style="width:100%;font-size:13px;padding:8px 10px;border-radius:var(--r);border:0.5px solid var(--border2);min-height:70px;font-family:var(--font);resize:vertical;" placeholder="What did they say? Was the staffer receptive? Any useful details for the next caller..."></textarea>
+              <div style="margin-top:8px;display:flex;gap:8px;">
+                <button class="btn btn-primary">Submit report</button>
+                <button class="btn" onclick="document.getElementById('report-form').style.display='none'">Cancel</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- SHARE TAB -->
+          <div class="tab-panel" id="tab-share">
+            <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6;">Sharing amplifies everything. Armitage's model: send to two people and ask them each to send to two more. That's how this reaches the governors. Below are ready-to-use messages for different platforms.</div>
+            <div style="background:var(--bg2);border-radius:var(--r);padding:12px 14px;margin-bottom:10px;">
+              <div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:6px;">FOR SOCIAL MEDIA (Twitter/X, Facebook, Mastodon)</div>
+              <div style="font-size:13px;color:var(--text);line-height:1.6;" id="social-text">The federal tools for accountability are broken. But governors have the power to act right now — and the pardon stops at the state line. Contact your governor and demand a state of emergency declaration. [link] #ShadowGovernment #StateEmergency</div>
+              <button class="lt-btn" style="margin-top:8px;" onclick="copySocial()"><i class="ti ti-copy" style="font-size:13px;vertical-align:-2px;margin-right:3px;"></i>Copy</button>
+            </div>
+            <div style="background:var(--bg2);border-radius:var(--r);padding:12px 14px;margin-bottom:10px;">
+              <div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:6px;">FOR EMAIL TO FRIENDS (forward to two people)</div>
+              <div style="font-size:13px;color:var(--text);line-height:1.6;">I just contacted my governor about declaring a state of emergency. The argument is compelling and the action takes five minutes. I think you should read this and do the same. [link to Armitage article] — Will you send it to two more people?</div>
+              <button class="lt-btn" style="margin-top:8px;" onclick="alert('Copied! Paste into your email client.')"><i class="ti ti-copy" style="font-size:13px;vertical-align:-2px;margin-right:3px;"></i>Copy</button>
+            </div>
+            <div style="background:var(--blue-bg);border-radius:var(--r);padding:12px 14px;font-size:13px;color:var(--blue-dark);">
+              <strong>Original article:</strong> <a href="https://christopherarmitage.substack.com" target="_blank" style="color:var(--blue);">Christopher Armitage on Substack — "Existential Republic"</a><br>
+              <span style="font-size:12px;color:var(--blue);">Credit the source when you share. It helps build the network and directs people to more of his work.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BRIEFING -->
+      <div class="card" style="margin-bottom:12px;">
+        <div class="tabs">
+          <button class="tab active" onclick="openBriefTab('brief-article',this)">Full article</button>
+          <button class="tab" onclick="openBriefTab('brief-context',this)">Key facts</button>
+          <button class="tab" onclick="openBriefTab('brief-progress',this)">Campaign progress</button>
+        </div>
+        <div class="tab-content">
+
+          <div class="tab-panel active" id="brief-article">
+            <div class="article-byline">Christopher Armitage · Existential Republic · June 24, 2026 · <a href="https://christopherarmitage.substack.com" target="_blank" style="color:var(--blue);">Original on Substack</a></div>
+            <div class="article-body">
+              <p>There's something that can stop the United States from fully becoming a dictatorship, and it's being left unused.</p>
+              <p>The federal government is holding about 60,000 people in detention facilities, and elected representatives who try to inspect them are being barred and even arrested. Federal agents have killed American citizens on American streets and hidden their identities while doing it. The administration froze $259.5 million in Minnesota's Medicaid funding while more than a million people depend on the program. DOGE copied the personal data of 300 million Americans onto an unsecured server. The president has called for the federal government to take over state elections.</p>
+              <p>The president took the country to war with Iran without congressional authorization.</p>
+              <p>Governors have declared states of emergency for far less than any single one of these. Together they represent the largest sustained assault on constitutional governance in American history.</p>
+              <p><strong>None of these are separate crises.</strong> The Epstein files are the web we're caught in. The people starting these wars and funding the authoritarian takeover are in those files. That's the key.</p>
+              <p>The federal investigation into Epstein's co-conspirators is dead. SDNY had an active investigation. DOJ headquarters ordered the files transferred out of SDNY, and the investigation stopped. The FBI closed it in July 2025 with a two-page memo claiming no evidence existed. Nearly fifty women gave federal prosecutors the names of roughly twenty co-conspirators. Every bit of it went nowhere.</p>
+              <p><strong>So who stops this?</strong></p>
+              <p>How does Congress stop him? They pass a law and he ignores it. How do the courts stop him? They issue rulings and there's no one left to enforce them. Inside the federal government, the tools are broken. Every single one of them.</p>
+              <p>But the United States is hundreds of independent governments, and fifty of them are dual sovereigns with their own constitutions, their own criminal codes, their own courts, their own prosecutors, their own police, their own prisons.</p>
+              <p><strong>Every one of those fifty governors has the power to declare a state of emergency.</strong> That declaration unlocks broad, fast, unilateral authority. The founders designed the country this way because they knew this exact thing could happen.</p>
+              <p>Twenty-six governors won't ever do this — they're part of the same organization causing the crisis. That leaves twenty-four. <strong>Twenty-four is enough.</strong></p>
+              <p>One governor launching this investigation is the law working as designed. Every additional governor is a force multiplier. Two and the administration's resources are split. Three and they're split again.</p>
+              <p>Is Trump going to arrest twenty-four governors for investigating child sex trafficking? Hell no. And if he tries, that makes the story bigger, not smaller.</p>
+              <p>Then the whole thing cascades. A line attorney who received the order to shut down the federal investigation sits in front of a state grand jury — facing state felony charges no pardon can reach — and names the person who gave the order.</p>
+              <p><strong>You want to end the war? Investigate the files. You want to save elections? Investigate the files. You want to open the internment camps? Investigate the files. You want to end the dictatorship? Investigate the files.</strong> It all leads to the same place because it all comes from the same place.</p>
+              <p>I don't expect your governor to do this right now. The point of sending this is to get them thinking about it and to show them what their constituents want. Enough of those messages and a governor and their staff are thinking about it. Enough of that and they are talking about it. Thoughts become conversations, and conversations can become actions.</p>
+              <p><strong>Please, contact your governor.</strong></p>
+            </div>
+            <div class="article-source"><i class="ti ti-info-circle" style="color:var(--text3);font-size:16px;flex-shrink:0;"></i>Reproduced with attribution. Original: Christopher Armitage, Existential Republic, Substack. All action templates on this site are based on the author's own suggested actions.</div>
+          </div>
+
+          <div class="tab-panel" id="brief-context">
+            <div class="h3">Key documented facts</div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;">
+              <div style="background:var(--bg2);border-radius:var(--r);padding:10px 14px;"><div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px;">60,000 people in federal detention</div><div style="font-size:12px;color:var(--text2);line-height:1.5;">Elected representatives attempting inspection have been barred and arrested. Sources: multiple congressional accounts, press reports.</div></div>
+              <div style="background:var(--bg2);border-radius:var(--r);padding:10px 14px;"><div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px;">$259.5M in Minnesota Medicaid frozen</div><div style="font-size:12px;color:var(--text2);line-height:1.5;">Over one million people depend on the program. Federal action without congressional authorization.</div></div>
+              <div style="background:var(--bg2);border-radius:var(--r);padding:10px 14px;"><div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px;">300 million Americans' data copied to unsecured server</div><div style="font-size:12px;color:var(--text2);line-height:1.5;">DOGE. Voter data agreement subsequently signed with a political advocacy group.</div></div>
+              <div style="background:var(--bg2);border-radius:var(--r);padding:10px 14px;"><div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px;">Epstein investigation shut down by DOJ</div><div style="font-size:12px;color:var(--text2);line-height:1.5;">SDNY active investigation transferred and ended. FBI closed with two-page memo. ~50 women gave prosecutors ~20 co-conspirators' names. Zero federal indictments.</div></div>
+              <div style="background:var(--bg2);border-radius:var(--r);padding:10px 14px;"><div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px;">War with Iran — no congressional authorization</div><div style="font-size:12px;color:var(--text2);line-height:1.5;">Article I of the Constitution requires congressional declaration of war. This did not happen.</div></div>
+              <div style="background:var(--blue-bg);border-radius:var(--r);padding:10px 14px;"><div style="font-size:12px;font-weight:600;color:var(--blue-dark);margin-bottom:3px;">The legal argument for governors</div><div style="font-size:12px;color:var(--blue);line-height:1.5;">Every state has its own criminal code, courts, grand juries, and prosecutors. Federal pardon power stops at the state line. An emergency declaration unlocks broad, fast, unilateral authority the governor can use immediately without legislative approval.</div></div>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="brief-progress">
+            <div class="h3">Campaign progress</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0;">
+              <div style="background:var(--bg2);border-radius:var(--r);padding:10px;text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--blue);">8,847</div><div style="font-size:11px;color:var(--text3);">Governor contacts logged</div></div>
+              <div style="background:var(--bg2);border-radius:var(--r);padding:10px;text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--green);">47</div><div style="font-size:11px;color:var(--text3);">States with active campaigns</div></div>
+              <div style="background:var(--bg2);border-radius:var(--r);padding:10px;text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--amber);">3</div><div style="font-size:11px;color:var(--text3);">Governors publicly discussing</div></div>
+            </div>
+            <div style="background:var(--green-bg);border:0.5px solid #C0DD97;border-radius:var(--r);padding:10px 14px;margin-bottom:8px;"><div style="font-size:13px;font-weight:500;color:var(--green-dark);margin-bottom:3px;">Washington Governor Ferguson publicly responded</div><div style="font-size:12px;color:var(--green);line-height:1.5;">After receiving thousands of contacts including Armitage's direct message, Governor Ferguson acknowledged the constitutional questions raised and said his office is "reviewing the legal landscape."</div></div>
+            <div style="background:var(--bg2);border-radius:var(--r);padding:10px 14px;margin-bottom:8px;"><div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;">New York, California, and Colorado campaigns active</div><div style="font-size:12px;color:var(--text2);line-height:1.5;">Working groups in all three states coordinating call days and letter campaigns. Constituent delegations being organized in NY and CA.</div></div>
+            <button class="btn btn-primary" onclick="showReportForm();openTab('tab-phone',document.querySelectorAll('.tab')[1])">Log your action and join the count →</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== GOVERNOR FINDER (STANDALONE) ===== -->
+    <div class="page" id="page-govfinder">
+      <div class="card card-blue" style="margin-bottom:12px;">
+        <div class="h2"><i class="ti ti-map-pin" style="margin-right:6px;"></i>Find your governor</div>
+        <div class="body-text">Enter your state to get your governor's name, phone number, and contact form link — pre-filled into every action template on this site.</div>
+      </div>
+      <div class="gov-finder">
+        <div class="gf-title">Enter your state</div>
+        <div class="gf-sub">Two-letter state abbreviation (NY, CA, TX...) or just start typing your state name</div>
+        <div class="gf-row">
+          <input class="gf-input" id="state-input-2" placeholder="e.g. NY, CA, WA, TX..." maxlength="10" oninput="this.value=this.value.toUpperCase()">
+          <button class="btn btn-primary" onclick="findGov2()">Find my governor</button>
+        </div>
+        <div class="gov-result" id="gov-result-2" style="display:none;">
+          <div class="gov-card">
+            <div class="gov-name" id="gov-name-2"></div>
+            <div class="gov-state">Governor of <span id="gov-state-2"></span> · <span id="gov-party-2"></span></div>
+            <div style="margin-top:8px;">
+              <div class="gov-contact-item"><i class="ti ti-phone"></i><span id="gov-phone-2"></span></div>
+              <div class="gov-contact-item" style="margin-top:4px;"><i class="ti ti-external-link"></i><a id="gov-link-2" href="#" target="_blank" style="color:var(--blue);font-size:12px;">Contact form / website</a></div>
+            </div>
+            <div class="gov-actions">
+              <button class="btn btn-red" onclick="nav('action',document.querySelectorAll('.nav-item')[1])">Take action — use letter template →</button>
+            </div>
+            <div id="gov-note-2" style="display:none;margin-top:10px;padding:8px 12px;border-radius:var(--r);font-size:12px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ISSUES (STUB) ===== -->
+    <div class="page" id="page-issues">
+      <div class="card card-blue" style="margin-bottom:12px;">
+        <div class="h1">All issues</div>
+        <div class="body-text">Pick the issues where you have energy, knowledge, or connection. Each becomes a working group with its own briefings, research, actions, and community. You don't have to fight everything — just something, effectively, with others.</div>
+      </div>
+      <div class="issue-grid">
+        <div class="issue-card featured" onclick="nav('action',document.querySelectorAll('.nav-item')[1])">
+          <div class="issue-hot">ACTIVE</div>
+          <div class="issue-icon"><i class="ti ti-building-bank"></i></div>
+          <div class="issue-title">State sovereignty &amp; emergency powers</div>
+          <div class="issue-meta">Governor action · Epstein accountability · Constitutional crisis</div>
+        </div>
+        <div class="issue-card" onclick="nav('issues',null)"><div class="issue-icon"><i class="ti ti-checkbox"></i></div><div class="issue-title">Democracy &amp; voting rights</div><div class="issue-meta">Machines, paper ballots, suppression</div></div>
+        <div class="issue-card" onclick="nav('issues',null)"><div class="issue-icon"><i class="ti ti-heart-rate-monitor"></i></div><div class="issue-title">Healthcare access</div><div class="issue-meta">ACA, Medicaid, prescription costs</div></div>
+        <div class="issue-card" onclick="nav('issues',null)"><div class="issue-icon"><i class="ti ti-leaf"></i></div><div class="issue-title">Climate &amp; environment</div><div class="issue-meta">EPA rollbacks, clean energy</div></div>
+        <div class="issue-card" onclick="nav('issues',null)"><div class="issue-icon"><i class="ti ti-scale"></i></div><div class="issue-title">Economic inequality</div><div class="issue-meta">Wages, unions, tax policy</div></div>
+        <div class="issue-card" onclick="nav('issues',null)"><div class="issue-icon"><i class="ti ti-hammer"></i></div><div class="issue-title">Workers &amp; labor</div><div class="issue-meta">NLRB, minimum wage, unions</div></div>
+        <div class="issue-card" onclick="nav('issues',null)"><div class="issue-icon"><i class="ti ti-calendar-heart"></i></div><div class="issue-title">Social Security</div><div class="issue-meta">Cuts, privatization, protection</div></div>
+        <div class="issue-card" onclick="nav('contract',null)"><div class="issue-icon"><i class="ti ti-writing"></i></div><div class="issue-title">The social contract</div><div class="issue-meta">The deal we never got to negotiate</div></div>
+        <div class="add-card" onclick="alert('Add your issue — coming soon in full version!')"><i class="ti ti-plus"></i><span style="font-size:12px;color:var(--text2);">Don't see your issue?<br>Add it here</span></div>
+      </div>
+    </div>
+
+    <!-- ===== GOVERNMENT (STUB) ===== -->
+    <div class="page" id="page-government">
+      <div class="card card-blue">
+        <div class="h2"><i class="ti ti-building-bank" style="margin-right:6px;"></i>Your representatives — all levels</div>
+        <div class="body-text" style="margin-bottom:12px;">Enter your zip code to see every elected official from city council to U.S. Senate — with voting records, donor maps, community reports, and active pressure campaigns targeting each one.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;max-width:380px;">
+          <input class="gf-input" placeholder="Enter your zip code...">
+          <button class="btn btn-primary">Find my reps →</button>
+        </div>
+        <div style="margin-top:12px;font-size:12px;color:var(--text3);">Full rep scorecard with voting history, donor maps, issue scores, and community reports available in the complete site.</div>
+      </div>
+    </div>
+
+    <!-- ===== ARMY (STUB) ===== -->
+    <div class="page" id="page-army">
+      <div class="card" style="background:var(--blue-bg);border-color:#B5D4F4;text-align:center;padding:20px;">
+        <div style="font-size:13px;color:var(--blue);margin-bottom:12px;line-height:1.7;">While you focus on your issues, here is everyone else holding the other lines.<br><strong style="color:var(--blue-dark);">You are not alone. The army is at work.</strong></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:600px;margin:0 auto;">
+          <div style="background:white;border:0.5px solid #B5D4F4;border-radius:var(--r);padding:10px;"><div style="font-size:22px;font-weight:700;color:var(--blue-dark);">47,312</div><div style="font-size:10px;color:var(--blue);">Active members</div></div>
+          <div style="background:white;border:0.5px solid #B5D4F4;border-radius:var(--r);padding:10px;"><div style="font-size:22px;font-weight:700;color:var(--blue-dark);">31</div><div style="font-size:10px;color:var(--blue);">Issues covered</div></div>
+          <div style="background:white;border:0.5px solid #B5D4F4;border-radius:var(--r);padding:10px;"><div style="font-size:22px;font-weight:700;color:var(--blue-dark);">284</div><div style="font-size:10px;color:var(--blue);">Active campaigns</div></div>
+          <div style="background:white;border:0.5px solid #B5D4F4;border-radius:var(--r);padding:10px;"><div style="font-size:22px;font-weight:700;color:var(--blue-dark);">31/31</div><div style="font-size:10px;color:var(--blue);">Issues with groups</div></div>
+        </div>
+        <div style="margin-top:12px;font-size:12px;color:var(--blue);">Full working group directory with member counts, activity levels, and cross-issue coordination available in the complete site.</div>
+      </div>
+    </div>
+
+    <!-- ===== CITIZENSHIP SKILLS (STUB) ===== -->
+    <div class="page" id="page-skills">
+      <div class="card card-blue" style="margin-bottom:12px;">
+        <div class="h2"><i class="ti ti-school" style="margin-right:6px;"></i>Citizenship skills</div>
+        <div class="body-text">The civic education the public school system stopped providing. You can't climb the participation ladder without skills. This section builds them.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="card"><div class="h3"><i class="ti ti-brain" style="margin-right:5px;color:var(--blue);"></i>Logic &amp; argument</div><div class="body-text">Deductive, inductive, and abductive reasoning. How to build a sound argument and spot a weak one.</div></div>
+        <div class="card"><div class="h3"><i class="ti ti-alert-triangle" style="margin-right:5px;color:var(--amber);"></i>Logical fallacies</div><div class="body-text">Ad hominem, straw man, false dilemma, slippery slope, whataboutism — named, defined, with real political examples.</div></div>
+        <div class="card"><div class="h3"><i class="ti ti-microphone" style="margin-right:5px;color:var(--green);"></i>Assertiveness skills</div><div class="body-text">How to speak at a town hall. How to hold your ground under pressure. How to make an ask.</div></div>
+        <div class="card"><div class="h3"><i class="ti ti-file-search" style="margin-right:5px;color:var(--purple);"></i>Media literacy</div><div class="body-text">How to read a news story, evaluate a source, identify framing, and spot disinformation.</div></div>
+        <div class="card"><div class="h3"><i class="ti ti-handshake" style="margin-right:5px;color:var(--blue);"></i>Negotiation basics</div><div class="body-text">BATNA, interests vs. positions, finding common ground. The difference between debate and dialogue.</div></div>
+        <div class="card"><div class="h3"><i class="ti ti-calendar-event" style="margin-right:5px;color:var(--green);"></i>Meeting &amp; organizing</div><div class="body-text">How to run a meeting, build an agenda, make a motion, keep minutes. Relationship-based organizing.</div></div>
+      </div>
+    </div>
+
+    <!-- ===== SOCIAL CONTRACT (STUB) ===== -->
+    <div class="page" id="page-contract">
+      <div class="card card-amber" style="margin-bottom:12px;">
+        <div class="h2"><i class="ti ti-writing" style="margin-right:6px;"></i>The social contract</div>
+        <div class="body-text" style="margin-bottom:10px;">Nobody asked us. We never engaged in the negotiations. We never agreed. It was legally assumed — like the tech contract nobody reads — that by existing in this jurisdiction you consented to all terms.</div>
+        <div style="background:var(--amber-bg);border-left:3px solid var(--amber);border-radius:0 var(--r) var(--r) 0;padding:12px 14px;font-size:13px;color:var(--amber-dark);font-style:italic;line-height:1.7;">"The social contract was written by and for the powerful. We were handed it and told: this is what you agreed to. By continuing to exist in this jurisdiction you agree to all terms. It is long past time to have the negotiation we never had — about what we actually want from the society we share."</div>
+      </div>
+      <div class="card"><div class="h3">The discussion we never had</div><div class="body-text">This working group exists to surface the fundamental questions: What do we actually owe each other? What should government do and not do? What rights are non-negotiable? What would the social contract look like if we got to write it ourselves?<br><br>This is not a rhetorical exercise. It's the philosophical foundation that makes every other issue on this site coherent. If we can't articulate what we're fighting FOR, we're just reacting to what we're fighting against.</div></div>
+    </div>
+
+    <!-- ===== LADDER ===== -->
+    <div class="page" id="page-ladder">
+      <div class="card card-blue" style="margin-bottom:12px;">
+        <div class="h2">How you want to help — every rung matters</div>
+        <div class="body-text">No wrong place to be. No pressure to move up. Change your level any time.</div>
+        <div style="margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <span style="font-size:13px;color:var(--text2);">My current level:</span>
+          <select style="font-size:13px;padding:6px 10px;border-radius:var(--r);border:0.5px solid #B5D4F4;background:var(--blue-bg);color:var(--blue-dark);" onchange="updateLadder(this.value)">
+            <option value="1">1 — Stay informed</option>
+            <option value="2">2 — Share my opinions privately</option>
+            <option value="3">3 — Amplify and share</option>
+            <option value="4" selected>4 — Put my name on a letter</option>
+            <option value="5">5 — Make phone calls</option>
+            <option value="6">6 — Show up locally</option>
+            <option value="7">7 — Organize locally</option>
+            <option value="8">8 — Marches and rallies</option>
+            <option value="9">9 — Sustained pressure campaigns</option>
+            <option value="10">10 — Civil disobedience</option>
+            <option value="11">11 — Strike and economic withdrawal</option>
+          </select>
+        </div>
+      </div>
+      <div class="card">
+        <div id="ladder-list">
+          <div class="ladder-step" data-level="1"><div class="step-num sn-low">1</div><div class="step-body"><div class="step-title">Stay informed <span class="exp-pill exp-none">no exposure</span></div><div class="step-desc">Read the daily news. Understand your issues. An informed citizen is the foundation — and harder to manipulate.</div></div></div>
+          <div class="ladder-step" data-level="2"><div class="step-num sn-low">2</div><div class="step-body"><div class="step-title">Share your voice privately <span class="exp-pill exp-none">anonymous</span></div><div class="step-desc">Respond to polls, rate representatives, submit anonymous research tips. Your data improves working group strategy.</div></div></div>
+          <div class="ladder-step" data-level="3"><div class="step-num sn-low">3</div><div class="step-body"><div class="step-title">Amplify <span class="exp-pill exp-low">low exposure</span></div><div class="step-desc">Share content, forward to friends, recommend this site. Movements grow through personal networks.</div></div></div>
+          <div class="ladder-step my-level" data-level="4"><div class="step-num sn-mine">4</div><div class="step-body"><div class="step-title">Communicate in writing <span class="mine-tag">your level</span><span class="exp-pill exp-low">low risk</span></div><div class="step-desc">Sign a petition. Send a letter or email to a representative. Submit a public comment. Your name on record at very low personal risk. <strong>The governor letter above is a perfect level-4 action.</strong></div></div></div>
+          <div class="ladder-step" data-level="5"><div class="step-num sn-mid">5</div><div class="step-body"><div class="step-title">Make phone calls <span class="exp-pill exp-low">low exposure</span></div><div class="step-desc">Call your representative's office. Script provided. Two minutes. Staffers tally calls daily. Most people never do this — that's why it has outsized impact.</div></div></div>
+          <div class="ladder-step" data-level="6"><div class="step-num sn-mid">6</div><div class="step-body"><div class="step-title">Show up locally <span class="exp-pill exp-low">low exposure</span></div><div class="step-desc">Town halls, county board meetings, school board hearings. You don't have to speak. Being a body in the room is noticed.</div></div></div>
+          <div class="ladder-step" data-level="7"><div class="step-num sn-mid">7</div><div class="step-body"><div class="step-title">Organize locally <span class="exp-pill exp-med">medium commitment</span></div><div class="step-desc">Join or start a local chapter. Host a house meeting. Relationship-based organizing is the most durable kind.</div></div></div>
+          <div class="ladder-step" data-level="8"><div class="step-num sn-high">8</div><div class="step-body"><div class="step-title">Visible public action <span class="exp-pill exp-med">visible, protected</span></div><div class="step-desc">Rallies, marches, vigils, demonstrations. Fully protected by the First Amendment.</div></div></div>
+          <div class="ladder-step" data-level="9"><div class="step-num sn-high">9</div><div class="step-body"><div class="step-title">Sustained pressure campaigns <span class="exp-pill exp-med">sustained</span></div><div class="step-desc">Coordinated call blitzes, office visits, constituent delegations over weeks and months. Creates the sustained pressure that actually changes votes.</div></div></div>
+          <div class="ladder-step" data-level="10"><div class="step-num sn-bold">10</div><div class="step-body"><div class="step-title">Civil disobedience <span class="exp-pill exp-high">accepts consequences</span></div><div class="step-desc">Nonviolent direct action. Accepts legal consequences. Requires training. Essential for some moments. Not for everyone.</div></div></div>
+          <div class="ladder-step" data-level="11"><div class="step-num sn-bold">11</div><div class="step-body"><div class="step-title">Strike &amp; economic withdrawal <span class="exp-pill exp-high">high commitment</span></div><div class="step-desc">Withhold your labor, your spending, your participation in systems that depend on your compliance. The most powerful nonviolent tool available to ordinary people.</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== DASHBOARD (STUB) ===== -->
+    <div class="page" id="page-dashboard">
+      <div class="card card-blue">
+        <div class="h2">My dashboard</div>
+        <div class="body-text">Your personal hub — saved issues, your representatives with current scores, campaigns you're tracking, reports you've submitted, and badges earned. Everything personalized. You control what's private.<br><br>Full member dashboard available when you join.</div>
+        <div style="margin-top:12px;"><button class="btn btn-primary">Join — it's free →</button></div>
+      </div>
+    </div>
+
+    <!-- ===== ORIENTATION ===== -->
+    <div class="page" id="page-orientation">
+      <div class="card card-blue" style="margin-bottom:12px;">
+        <div class="h1">What is A Shadow Government?</div>
+        <div class="body-text">A volunteer-built, community-maintained organizing hub. Nobody owns it — we all do. It exists to provide the structure that turns a disorganized majority into an effective people's movement.</div>
+      </div>
+      <div class="card" style="margin-bottom:12px;">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="background:var(--bg2);border-radius:var(--r);padding:12px 14px;"><div style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Step 1</div><div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;">Pick your issues</div><div style="font-size:12px;color:var(--text2);line-height:1.5;">Choose where you have energy, knowledge, or connection. You don't have to fight everything — just something, effectively, with others.</div></div>
+          <div style="background:var(--bg2);border-radius:var(--r);padding:12px 14px;"><div style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Step 2</div><div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;">Know your representatives</div><div style="font-size:12px;color:var(--text2);line-height:1.5;">Enter your zip code once. See every official who represents you, who funds them, how they score on your issues, and what other members learned from contacting them.</div></div>
+          <div style="background:var(--bg2);border-radius:var(--r);padding:12px 14px;"><div style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Step 3</div><div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;">Take action at your level</div><div style="font-size:12px;color:var(--text2);line-height:1.5;">Every issue has a full menu of actions from a 2-minute letter to sustained civil disobedience. You pick your level. Every rung is honored.</div></div>
+          <div style="background:var(--bg2);border-radius:var(--r);padding:12px 14px;"><div style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Step 4</div><div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;">Contribute what you know</div><div style="font-size:12px;color:var(--text2);line-height:1.5;">Submit research, rate a representative, help organize a campaign, add an issue. You're building this too.</div></div>
+          <div style="background:var(--blue-bg);border-left:3px solid var(--blue);border-radius:0 var(--r) var(--r) 0;padding:12px 14px;"><div style="font-size:13px;font-weight:600;color:var(--blue-dark);margin-bottom:5px;">Why this works differently</div><div style="font-size:13px;color:var(--blue);line-height:1.7;">They're winning because they're specialized. They fund people whose entire job is one thing. We try to fight everything at once and burn out.<br><br>This site provides structure from the bottom up. You choose your issue. You join others working it. <strong>You don't have to fight everything. You have to fight something, effectively, with others.</strong></div></div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ===== WIKIGOVERNMENT RESEARCH ===== -->
+    <div class="page" id="page-research">
+      <div class="card card-blue" style="margin-bottom:12px;">
+        <div class="h1"><i class="ti ti-database" style="margin-right:8px;"></i>WikiGovernment Research Directories</div>
+        <div class="body-text" style="margin-bottom:10px;">A citizen-built, community-maintained knowledge base about the people and institutions of power. Every entry is sourced. Every claim is citable. Anyone can contribute. Everything is verifiable.</div>
+        <div style="background:var(--bg2);border-left:3px solid var(--blue);border-radius:0 var(--r) var(--r) 0;padding:10px 14px;font-size:13px;color:var(--text2);font-style:italic;line-height:1.6;">"WikiGovernment is to democratic accountability what Wikipedia is to knowledge — the platform enables it, the community builds it."<br><strong style="font-style:normal;color:var(--text);">Domain registered: wikigovernment.net / .org / .info</strong></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><i class="ti ti-list-check" style="font-size:20px;color:var(--blue);"></i><div class="h2" style="margin-bottom:0;">Issues</div></div>
+          <div class="body-text" style="margin-bottom:8px;">Every political issue area. The home page shows most active issues at any time; the full directory lives here.</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:8px;">Each issue page: Overview · Stakes · Sides · Key players · Funding · Actions · Progress · Wins</div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;">
+            <span class="tag tag-red">State emergency powers</span>
+            <span class="tag tag-blue">Democracy &amp; voting</span>
+            <span class="tag tag-blue">Healthcare</span>
+            <span class="tag tag-blue">Climate</span>
+            <span class="tag tag-blue">Economic inequality</span>
+            <span class="tag tag-blue">Labor &amp; workers</span>
+            <span class="tag tag-blue">Social Security</span>
+            <span class="tag tag-blue">Education</span>
+            <span class="tag tag-blue">Housing</span>
+            <span class="tag tag-blue">Reproductive rights</span>
+            <span class="tag tag-blue">Civil rights</span>
+            <span class="tag tag-blue">Immigration</span>
+            <span class="tag tag-blue">LGBTQ+ rights</span>
+            <span class="tag tag-blue">Food security</span>
+            <span class="tag tag-blue">Separation of powers</span>
+            <span class="tag tag-blue">Press freedom</span>
+            <span class="tag tag-blue">Criminal justice</span>
+            <span class="tag tag-blue">Gun violence</span>
+            <span class="tag tag-blue">Disability rights</span>
+            <span class="tag tag-blue">Drug policy</span>
+            <span class="tag tag-blue">Trade &amp; tariffs</span>
+            <span class="tag tag-blue">Veterans</span>
+            <span class="tag tag-blue">Mental health</span>
+            <span class="tag tag-blue">Native rights</span>
+            <span class="tag tag-blue">Money in politics</span>
+            <span class="tag tag-blue">Social contract</span>
+            <span class="tag" style="border-style:dashed;cursor:pointer;">+ Add issue</span>
+          </div>
+        </div>
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><i class="ti ti-building-bank" style="font-size:20px;color:var(--amber);"></i><div class="h2" style="margin-bottom:0;">Governments in Power</div></div>
+          <div class="body-text" style="margin-bottom:8px;">Every level of government — from the UN to your local school board.</div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">International</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
+            <span class="tag">United Nations</span><span class="tag">NATO</span><span class="tag">World Bank</span><span class="tag">IMF</span><span class="tag">BIS</span><span class="tag">WTO</span><span class="tag">ICC</span><span class="tag">WHO</span><span class="tag">EU</span><span class="tag">G7 / G20</span>
+          </div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">National (U.S.)</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
+            <span class="tag">Executive Branch</span><span class="tag">U.S. Senate</span><span class="tag">U.S. House</span><span class="tag">Supreme Court</span><span class="tag">Federal Agencies</span><span class="tag">Independent Commissions</span><span class="tag">Military</span>
+          </div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">State &amp; Local</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;">
+            <span class="tag">50 Governors + offices</span><span class="tag">State Legislatures</span><span class="tag">State Courts</span><span class="tag">State AGs</span><span class="tag">County Govts</span><span class="tag">City Councils</span><span class="tag">School Boards</span><span class="tag">Special Districts</span>
+          </div>
+        </div>
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><i class="ti ti-network" style="font-size:20px;color:var(--red);"></i><div class="h2" style="margin-bottom:0;">NGOs &amp; Organizations</div></div>
+          <div class="body-text" style="margin-bottom:8px;">The full ecosystem shaping policy — funding campaigns, writing legislation, building power.</div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">Dark money &amp; campaign finance</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
+            <span class="tag tag-red">Super PACs</span><span class="tag tag-red">501(c)(4) social welfare orgs</span><span class="tag tag-red">501(c)(6) trade associations</span><span class="tag tag-red">Political parties</span><span class="tag tag-red">Bundlers &amp; fundraising networks</span>
+          </div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">Think tanks &amp; policy</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
+            <span class="tag">Heritage Foundation</span><span class="tag">ALEC</span><span class="tag">Cato</span><span class="tag">Federalist Society</span><span class="tag">Brookings</span><span class="tag">CFR</span><span class="tag">+ hundreds more</span>
+          </div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">Advocacy groups</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;">
+            <span class="tag">ACLU</span><span class="tag">NRA</span><span class="tag">AFL-CIO</span><span class="tag">Sierra Club</span><span class="tag">NAACP</span><span class="tag">AARP</span><span class="tag">+ thousands more</span>
+          </div>
+        </div>
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><i class="ti ti-users" style="font-size:20px;color:var(--green);"></i><div class="h2" style="margin-bottom:0;">Individual People</div></div>
+          <div class="body-text" style="margin-bottom:8px;">Every person who matters to how power is exercised — elected, appointed, wealthy, or influential.</div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">Politicians &amp; officeholders</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
+            <span class="tag tag-green">Federal Officials</span><span class="tag tag-green">State Officials</span><span class="tag tag-green">Local Electeds</span><span class="tag tag-green">Candidates</span><span class="tag tag-green">Former Officials</span>
+          </div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">Judicial (all levels)</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
+            <span class="tag">Supreme Court</span><span class="tag">Federal Circuit</span><span class="tag">State Supreme Courts</span><span class="tag">District Courts</span>
+          </div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">Wealthy &amp; influential</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;">
+            <span class="tag tag-red">Billionaire donors</span><span class="tag tag-red">$100K+ political donors</span><span class="tag tag-red">Corporate executives</span><span class="tag tag-red">Oligarch families</span><span class="tag tag-red">Dark money funders</span>
+          </div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:4px;">Media &amp; influencers</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;">
+            <span class="tag">TV &amp; radio hosts</span><span class="tag">Newspaper publishers</span><span class="tag">Substack writers</span><span class="tag">Podcast hosts</span><span class="tag">Social media influencers</span>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="background:var(--blue-bg);border-color:#B5D4F4;">
+        <div class="h3" style="color:var(--blue-dark);margin-bottom:8px;"><i class="ti ti-info-circle" style="margin-right:5px;"></i>Scale &amp; the Wikipedia model</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;">
+          <div style="background:white;border:0.5px solid #B5D4F4;border-radius:var(--r);padding:10px;text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--blue-dark);">~90K</div><div style="font-size:11px;color:var(--blue);">Units of local government</div></div>
+          <div style="background:white;border:0.5px solid #B5D4F4;border-radius:var(--r);padding:10px;text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--blue-dark);">500K+</div><div style="font-size:11px;color:var(--blue);">Elected officials (all levels)</div></div>
+          <div style="background:white;border:0.5px solid #B5D4F4;border-radius:var(--r);padding:10px;text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--blue-dark);">15K+</div><div style="font-size:11px;color:var(--blue);">Active PACs &amp; dark money orgs</div></div>
+        </div>
+        <div class="body-text">No small team can populate this. <strong>This is the Wikipedia model</strong> — we build the platform and standards; citizen researchers build the content. Federal and state levels seed automatically from free public APIs. Everything local is community-built.<br><br><span style="font-size:12px;color:var(--text3);">Data sources: Congress.gov · GovTrack · ProPublica · OpenStates · FEC.gov · OpenSecrets · Ballotpedia · IRS 990 filings</span></div>
+      </div>
+    </div>
+
+    <!-- ===== 198 ACTIONS ===== -->
+    <div class="page" id="page-actions">
+      <div class="card card-blue" style="margin-bottom:12px;">
+        <div class="h1"><i class="ti ti-list-check" style="margin-right:8px;"></i>198 Actions — Your Full Menu</div>
+        <div class="body-text" style="margin-bottom:10px;">Gene Sharp's 198 Methods of Nonviolent Action, expanded with community additions and mapped to the 11-rung participation ladder. Check off what you've done. Each one earns badge progress.</div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;">
+          <span style="font-size:13px;color:var(--text2);">Filter by rung:</span>
+          <select id="rung-filter" style="font-size:13px;padding:6px 10px;border-radius:var(--r);border:0.5px solid var(--border2);font-family:var(--font);" onchange="filterByRung(this.value)">
+            <option value="all">All rungs (206 actions)</option>
+            <option value="1">Rung 1 — Stay Informed</option>
+            <option value="2">Rung 2 — Share Voice Privately</option>
+            <option value="3">Rung 3 — Amplify &amp; Share</option>
+            <option value="4">Rung 4 — Communicate in Writing</option>
+            <option value="5">Rung 5 — Make Phone Calls</option>
+            <option value="6">Rung 6 — Show Up Locally</option>
+            <option value="7">Rung 7 — Organize Locally</option>
+            <option value="8">Rung 8 — Visible Public Action</option>
+            <option value="9">Rung 9 — Sustained Pressure</option>
+            <option value="10">Rung 10 — Civil Disobedience</option>
+            <option value="11">Rung 11 — Strike &amp; Withdrawal</option>
+          </select>
+          <span id="action-count" style="font-size:12px;color:var(--text3);">206 actions · <span id="checked-count">0</span> completed</span>
+        </div>
+      </div>
+      <div id="actions-container"></div>
+    </div>
+
+    </div><!-- end content -->
+</div><!-- end main -->
+</div><!-- end shell -->
+
+<script>
+// ============================================================
+// GOVERNOR DATA — all 50 states
+// ============================================================
+const GOVS = {
+  AL:{name:"Kay Ivey",state:"Alabama",party:"R",phone:"(334) 242-7100",url:"https://governor.alabama.gov/contact/"},
+  AK:{name:"Mike Dunleavy",state:"Alaska",party:"R",phone:"(907) 465-3500",url:"https://gov.alaska.gov/contact/"},
+  AZ:{name:"Katie Hobbs",state:"Arizona",party:"D",phone:"(602) 542-4331",url:"https://azgovernor.gov/contact"},
+  AR:{name:"Sarah Huckabee Sanders",state:"Arkansas",party:"R",phone:"(501) 682-2345",url:"https://governor.arkansas.gov/contact/"},
+  CA:{name:"Gavin Newsom",state:"California",party:"D",phone:"(916) 445-2841",url:"https://govapps.gov.ca.gov/gov39mail/"},
+  CO:{name:"Jared Polis",state:"Colorado",party:"D",phone:"(303) 866-2471",url:"https://governor.colorado.gov/contact-the-governors-office"},
+  CT:{name:"Ned Lamont",state:"Connecticut",party:"D",phone:"(860) 566-4840",url:"https://portal.ct.gov/Governor/Contact"},
+  DE:{name:"Matt Meyer",state:"Delaware",party:"D",phone:"(302) 744-4101",url:"https://governor.delaware.gov/contact/"},
+  FL:{name:"Ron DeSantis",state:"Florida",party:"R",phone:"(850) 717-9337",url:"https://www.flgov.com/contact-governor/"},
+  GA:{name:"Brian Kemp",state:"Georgia",party:"R",phone:"(404) 656-1776",url:"https://gov.georgia.gov/contact-governors-office"},
+  HI:{name:"Josh Green",state:"Hawaii",party:"D",phone:"(808) 586-0034",url:"https://governor.hawaii.gov/contact-us/"},
+  ID:{name:"Brad Little",state:"Idaho",party:"R",phone:"(208) 334-2100",url:"https://gov.idaho.gov/contact/"},
+  IL:{name:"JB Pritzker",state:"Illinois",party:"D",phone:"(217) 782-6830",url:"https://gov.illinois.gov/topics/contact.html"},
+  IN:{name:"Mike Braun",state:"Indiana",party:"R",phone:"(317) 232-4567",url:"https://www.in.gov/gov/contact/"},
+  IA:{name:"Kim Reynolds",state:"Iowa",party:"R",phone:"(515) 281-5211",url:"https://governor.iowa.gov/contact"},
+  KS:{name:"Laura Kelly",state:"Kansas",party:"D",phone:"(785) 296-3232",url:"https://governor.kansas.gov/contact-the-governor/"},
+  KY:{name:"Andy Beshear",state:"Kentucky",party:"D",phone:"(502) 564-2611",url:"https://governor.ky.gov/contact"},
+  LA:{name:"Jeff Landry",state:"Louisiana",party:"R",phone:"(225) 342-7015",url:"https://gov.louisiana.gov/contact/"},
+  ME:{name:"Janet Mills",state:"Maine",party:"D",phone:"(207) 287-3531",url:"https://www.maine.gov/governor/mills/contact"},
+  MD:{name:"Wes Moore",state:"Maryland",party:"D",phone:"(410) 974-3901",url:"https://governor.maryland.gov/pages/contact-the-governor.aspx"},
+  MA:{name:"Maura Healey",state:"Massachusetts",party:"D",phone:"(617) 725-4005",url:"https://www.mass.gov/governor-healey"},
+  MI:{name:"Gretchen Whitmer",state:"Michigan",party:"D",phone:"(517) 373-3400",url:"https://www.michigan.gov/whitmer/contact"},
+  MN:{name:"Tim Walz",state:"Minnesota",party:"D",phone:"(651) 201-3400",url:"https://mn.gov/governor/contact/"},
+  MS:{name:"Tate Reeves",state:"Mississippi",party:"R",phone:"(601) 359-3150",url:"https://governorreeves.ms.gov/contact/"},
+  MO:{name:"Mike Kehoe",state:"Missouri",party:"R",phone:"(573) 751-3222",url:"https://governor.mo.gov/contact-us"},
+  MT:{name:"Greg Gianforte",state:"Montana",party:"R",phone:"(406) 444-3111",url:"https://governor.mt.gov/contact/"},
+  NE:{name:"Jim Pillen",state:"Nebraska",party:"R",phone:"(402) 471-2244",url:"https://governor.nebraska.gov/contact"},
+  NV:{name:"Joe Lombardo",state:"Nevada",party:"R",phone:"(775) 684-5670",url:"https://gov.nv.gov/Contact/Contact_the_Governor/"},
+  NH:{name:"Kelly Ayotte",state:"New Hampshire",party:"R",phone:"(603) 271-2121",url:"https://www.governor.nh.gov/contact"},
+  NJ:{name:"Phil Murphy",state:"New Jersey",party:"D",phone:"(609) 292-6000",url:"https://nj.gov/governor/admin/contact/"},
+  NM:{name:"Michelle Lujan Grisham",state:"New Mexico",party:"D",phone:"(505) 476-2200",url:"https://www.governor.state.nm.us/contact-the-governor/"},
+  NY:{name:"Kathy Hochul",state:"New York",party:"D",phone:"(518) 474-8390",url:"https://www.governor.ny.gov/content/governor-contact-form"},
+  NC:{name:"Josh Stein",state:"North Carolina",party:"D",phone:"(919) 814-2000",url:"https://governor.nc.gov/contact"},
+  ND:{name:"Kelly Armstrong",state:"North Dakota",party:"R",phone:"(701) 328-2200",url:"https://www.governor.nd.gov/contact"},
+  OH:{name:"Mike DeWine",state:"Ohio",party:"R",phone:"(614) 466-3555",url:"https://governor.ohio.gov/wps/portal/gov/governor/contact"},
+  OK:{name:"Kevin Stitt",state:"Oklahoma",party:"R",phone:"(405) 521-2342",url:"https://www.governor.ok.gov/contact.html"},
+  OR:{name:"Tina Kotek",state:"Oregon",party:"D",phone:"(503) 378-4582",url:"https://www.oregon.gov/gov/Pages/share-your-opinion.aspx"},
+  PA:{name:"Josh Shapiro",state:"Pennsylvania",party:"D",phone:"(717) 787-2500",url:"https://www.governor.pa.gov/contact/"},
+  RI:{name:"Dan McKee",state:"Rhode Island",party:"D",phone:"(401) 222-2080",url:"https://governor.ri.gov/contact"},
+  SC:{name:"Henry McMaster",state:"South Carolina",party:"R",phone:"(803) 734-2100",url:"https://governor.sc.gov/contact"},
+  SD:{name:"Kristi Noem",state:"South Dakota",party:"R",phone:"(605) 773-3212",url:"https://news.sd.gov/contact/"},
+  TN:{name:"Bill Lee",state:"Tennessee",party:"R",phone:"(615) 741-2001",url:"https://www.tn.gov/governor/contact-the-governor.html"},
+  TX:{name:"Greg Abbott",state:"Texas",party:"R",phone:"(512) 463-2000",url:"https://gov.texas.gov/contact"},
+  UT:{name:"Spencer Cox",state:"Utah",party:"R",phone:"(801) 538-1000",url:"https://governor.utah.gov/contact/"},
+  VT:{name:"Phil Scott",state:"Vermont",party:"R",phone:"(802) 828-3333",url:"https://governor.vermont.gov/contact"},
+  VA:{name:"Glenn Youngkin",state:"Virginia",party:"R",phone:"(804) 786-2211",url:"https://www.governor.virginia.gov/contact-us/"},
+  WA:{name:"Bob Ferguson",state:"Washington",party:"D",phone:"(360) 902-4111",url:"https://governor.wa.gov/contact",note:"Gov. Ferguson has publicly acknowledged constituent messages on this issue and is 'reviewing the legal landscape.' Your contact matters here."},
+  WV:{name:"Patrick Morrisey",state:"West Virginia",party:"R",phone:"(304) 558-2000",url:"https://governor.wv.gov/Pages/contact.aspx"},
+  WI:{name:"Tony Evers",state:"Wisconsin",party:"D",phone:"(608) 266-1212",url:"https://evers.wi.gov/pages/contact.aspx"},
+  WY:{name:"Mark Gordon",state:"Wyoming",party:"R",phone:"(307) 777-7434",url:"https://governor.wyo.gov/contact"}
+};
+
+// ZIP to state map (abbreviated — major zip prefixes)
+const ZIP_STATE = {
+  "0":"CT","100":"NY","200":"DC","300":"GA","350":"AL","360":"AL","370":"TN",
+  "380":"TN","390":"MS","400":"KY","410":"KY","420":"KY","430":"OH","440":"OH",
+  "450":"OH","460":"IN","470":"IN","480":"MI","490":"MI","500":"IA","510":"IA",
+  "520":"IA","530":"WI","540":"WI","550":"MN","560":"MN","570":"SD","580":"ND",
+  "590":"MT","600":"IL","610":"IL","620":"IL","630":"MO","640":"MO","650":"MO",
+  "660":"KS","670":"KS","680":"NE","690":"NE","700":"LA","710":"LA","720":"AR",
+  "730":"OK","740":"OK","750":"TX","760":"TX","770":"TX","780":"TX","790":"TX",
+  "800":"CO","810":"CO","820":"WY","830":"ID","840":"UT","850":"AZ","860":"AZ",
+  "870":"NM","880":"NM","890":"NV","900":"CA","910":"CA","920":"CA","930":"CA",
+  "940":"CA","950":"CA","960":"CA","970":"OR","980":"WA","990":"WA"
+};
+
+function getStateFromInput(val) {
+  val = val.trim().toUpperCase();
+  if (GOVS[val]) return val;
+  // try zip
+  if (/^\d{5}$/.test(val)) {
+    const pre3 = val.slice(0,3);
+    const pre2 = val.slice(0,2);
+    const pre1 = val.slice(0,1);
+    return ZIP_STATE[pre3] || ZIP_STATE[pre2] || ZIP_STATE[pre1] || null;
+  }
+  // try state name
+  const name = val.charAt(0) + val.slice(1).toLowerCase();
+  for (const [k, v] of Object.entries(GOVS)) {
+    if (v.state.toLowerCase().includes(val.toLowerCase())) return k;
+  }
+  return null;
+}
+
+function populateGovUI(stateCode, nameEl, stateEl, partyEl, phoneEl, linkEl, noteEl, initialsEl) {
+  const g = GOVS[stateCode];
+  if (!g) return false;
+  if (nameEl) nameEl.textContent = 'Gov. ' + g.name;
+  if (stateEl) stateEl.textContent = g.state;
+  if (partyEl) { partyEl.textContent = g.party === 'D' ? 'Democrat' : 'Republican'; partyEl.className = g.party === 'D' ? 'party-d' : 'party-r'; }
+  if (phoneEl) phoneEl.textContent = g.phone;
+  if (linkEl) { linkEl.href = g.url; linkEl.textContent = 'Contact form / website'; }
+  if (initialsEl) { const parts = g.name.split(' '); initialsEl.textContent = parts.map(p=>p[0]).join('').slice(0,2); }
+  if (noteEl) {
+    if (g.note) { noteEl.style.display='block'; noteEl.style.background='var(--green-bg)'; noteEl.style.color='var(--green-dark)'; noteEl.textContent = g.note; }
+    else noteEl.style.display='none';
+  }
+  // Also fill in letter/email/phone templates
+  const ln = document.getElementById('letter-gov-name');
+  if (ln) ln.textContent = g.name;
+  const ls = document.getElementById('letter-state');
+  if (ls) ls.textContent = g.state;
+  const ls2 = document.getElementById('letter-state2');
+  if (ls2) ls2.textContent = g.state;
+  const en = document.getElementById('email-gov-name');
+  if (en) en.textContent = g.name;
+  const es = document.getElementById('email-state');
+  if (es) es.textContent = g.state;
+  const es2 = document.getElementById('email-state2');
+  if (es2) es2.textContent = g.state;
+  const pn = document.getElementById('phone-gov-name');
+  if (pn) pn.textContent = 'Gov. ' + g.name + ' (' + g.state + ')';
+  const ph = document.getElementById('phone-number');
+  if (ph) ph.textContent = g.phone;
+  const ll = document.getElementById('letter-contact-link');
+  if (ll) { ll.href = g.url; ll.textContent = g.url; }
+  return true;
+}
+
+function findGov() {
+  const val = document.getElementById('state-input').value;
+  const code = getStateFromInput(val);
+  const result = document.getElementById('gov-result');
+  if (!code) { result.style.display='block'; result.innerHTML='<div style="color:var(--red);font-size:13px;padding:10px;">Sorry, could not find a governor for "'+val+'". Try your two-letter state abbreviation (e.g. NY, CA, WA).</div>'; return; }
+  result.style.display='block';
+  result.innerHTML=`<div class="gov-card">
+    <div style="display:flex;align-items:flex-start;gap:12px;">
+      <div style="width:40px;height:40px;border-radius:50%;background:var(--blue-bg);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--blue-dark);flex-shrink:0;" id="gov-initials"></div>
+      <div style="flex:1;">
+        <div class="gov-name" id="gov-name"></div>
+        <div class="gov-state">Governor of <span id="gov-state-span"></span> · <span id="gov-party"></span></div>
+        <div class="gov-contact-item" style="margin-top:6px;"><i class="ti ti-phone"></i><span id="gov-phone-span"></span></div>
+        <div class="gov-contact-item" style="margin-top:4px;"><i class="ti ti-external-link"></i><a id="gov-link" href="#" target="_blank" style="color:var(--blue);font-size:12px;">Contact form</a></div>
+        <div class="gov-actions">
+          <button class="btn btn-red" onclick="scrollToLetter()">Use the letter template →</button>
+          <button class="btn btn-green" onclick="openTab('tab-phone',document.querySelectorAll('.tab')[2])">Call script</button>
+        </div>
+      </div>
+    </div>
+    <div id="gov-note-inline" style="display:none;margin-top:10px;padding:8px 12px;border-radius:var(--r);font-size:12px;"></div>
+  </div>`;
+  populateGovUI(code,
+    document.getElementById('gov-name'),
+    document.getElementById('gov-state-span'),
+    document.getElementById('gov-party'),
+    document.getElementById('gov-phone-span'),
+    document.getElementById('gov-link'),
+    document.getElementById('gov-note-inline'),
+    document.getElementById('gov-initials')
+  );
+}
+
+function findGov2() {
+  const val = document.getElementById('state-input-2').value;
+  const code = getStateFromInput(val);
+  const r = document.getElementById('gov-result-2');
+  r.style.display = 'block';
+  if (!code) { r.innerHTML='<div style="color:var(--red);font-size:13px;padding:10px;">Could not find "'+val+'". Try your state abbreviation (NY, CA, WA...).</div>'; return; }
+  const g = GOVS[code];
+  document.getElementById('gov-name-2').textContent = 'Gov. ' + g.name;
+  document.getElementById('gov-state-2').textContent = g.state;
+  document.getElementById('gov-party-2').textContent = g.party === 'D' ? 'Democrat' : 'Republican';
+  document.getElementById('gov-party-2').className = g.party === 'D' ? 'party-d' : 'party-r';
+  document.getElementById('gov-phone-2').textContent = g.phone;
+  document.getElementById('gov-link-2').href = g.url;
+  if (g.note) { const n = document.getElementById('gov-note-2'); n.style.display='block'; n.style.background='var(--green-bg)'; n.style.color='var(--green-dark)'; n.textContent=g.note; }
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function nav(id, navEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const pg = document.getElementById('page-' + id);
+  if (pg) pg.classList.add('active');
+  if (navEl) navEl.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function openTab(id, btn) {
+  const parent = btn ? btn.closest('.tabs').nextElementSibling : null;
+  if (parent) {
+    parent.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.closest('.tabs').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    const panel = document.getElementById(id);
+    if (panel) panel.classList.add('active');
+    if (btn) btn.classList.add('active');
+  } else {
+    document.getElementById(id).classList.add('active');
+  }
+}
+
+function openBriefTab(id, btn) {
+  ['brief-article','brief-context','brief-progress'].forEach(p => {
+    const el = document.getElementById(p);
+    if (el) el.classList.remove('active');
+  });
+  btn.closest('.tabs').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ============================================================
+// LETTER TOOLS
+// ============================================================
+function copyLetter() {
+  const el = document.getElementById('letter-content');
+  const text = el.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    alert('Letter copied! Now paste it into your governor\'s contact form at:\n' + (document.getElementById('letter-contact-link').href || 'https://www.usa.gov/state-governor'));
+  }).catch(() => {
+    const r = document.createRange(); r.selectNode(el);
+    window.getSelection().removeAllRanges(); window.getSelection().addRange(r);
+    document.execCommand('copy');
+    alert('Letter selected and copied. Paste into your governor\'s contact form.');
+  });
+}
+
+function copyEmail() {
+  const el = document.getElementById('email-content');
+  const text = el.innerText;
+  navigator.clipboard.writeText(text).then(() => alert('Email body copied!')).catch(() => {
+    const r = document.createRange(); r.selectNode(el);
+    window.getSelection().removeAllRanges(); window.getSelection().addRange(r);
+    document.execCommand('copy');
+  });
+}
+
+function copySubject() {
+  const text = document.getElementById('email-subject').textContent;
+  navigator.clipboard.writeText(text).then(() => alert('Subject line copied!')).catch(() => {});
+}
+
+function copySocial() {
+  const text = document.getElementById('social-text').textContent;
+  navigator.clipboard.writeText(text).then(() => alert('Social media text copied!')).catch(() => {});
+}
+
+function printLetter() { window.print(); }
+
+const ORIGINAL_LETTER = document.getElementById('letter-content') ? document.getElementById('letter-content').innerHTML : '';
+function resetLetter() {
+  if (confirm('Reset letter to original? Your edits will be lost.')) {
+    document.getElementById('letter-content').innerHTML = ORIGINAL_LETTER;
+  }
+}
+
+function scrollToLetter() {
+  const el = document.getElementById('letter-anchor');
+  if (el) { el.scrollIntoView({behavior:'smooth'}); }
+  // Also make sure we're on the action page
+  nav('action', document.querySelectorAll('.nav-item')[1]);
+  setTimeout(() => {
+    openTab('tab-letter', document.querySelector('.tab.active') || document.querySelectorAll('.tab')[0]);
+  }, 100);
+}
+
+// ============================================================
+// PHONE REPORT
+// ============================================================
+function showReportForm() {
+  const f = document.getElementById('report-form');
+  if (f) { f.style.display = f.style.display === 'none' ? 'block' : 'none'; }
+}
+
+// ============================================================
+// PARTICIPATION LADDER
+// ============================================================
+function updateLadder(val) {
+  document.querySelectorAll('.ladder-step').forEach(s => {
+    s.classList.remove('my-level');
+    const c = s.querySelector('.step-num');
+    if (c) {
+      const lv = parseInt(s.dataset.level);
+      c.className = 'step-num ' + (lv <= 3 ? 'sn-low' : lv <= 6 ? 'sn-mid' : lv <= 9 ? 'sn-high' : 'sn-bold');
+    }
+    const mb = s.querySelector('.mine-tag');
+    if (mb) mb.remove();
+  });
+  const target = document.querySelector(`.ladder-step[data-level="${val}"]`);
+  if (target) {
+    target.classList.add('my-level');
+    const c = target.querySelector('.step-num');
+    if (c) c.className = 'step-num sn-mine';
+    const title = target.querySelector('.step-title');
+    if (title && !title.querySelector('.mine-tag')) {
+      const mb = document.createElement('span');
+      mb.className = 'mine-tag'; mb.textContent = 'your level';
+      title.insertBefore(mb, title.querySelector('.exp-pill'));
+    }
+  }
+}
+
+const SHARP_METHODS = {
+  1: [
+    {num:'', name:"Watch or listen to the mainstream news", example:"MSNOW, CNN,"},
+    {num:'', name:"Read the mainstream media", example:"NYT, WaPo,"},
+    {num:'', name:"Read or watch alternative online news", example:"Meidas Touch Network, The Bulwark, etc."},
+  ],
+  2: [
+    {num:'', name:"Take part in a poll to express your views", example:""},
+    {num:'', name:"Share your research anonymously", example:"on issues, organizations, individuals, etc."},
+  ],
+  3: [
+    {num:'', name:"Share your research openly (wikigov)", example:"on issues, organizations, individuals, etc"},
+    {num:'7', name:"Slogans, caricatures & symbols", example:"Yard signs, bumper stickers, political art"},
+    {num:'8', name:"Banners, posters & displayed communications", example:"Hang a banner, post flyers in your community"},
+    {num:'18', name:"Displays of flags & symbolic colors", example:"Wear a button, ribbon, or color that signals your position"},
+    {num:'19', name:"Wearing of symbols", example:"Armbands, pins, T-shirts with a political message"},
+    {num:'25', name:"Displays of portraits", example:"Display images of victims or heroes in public spaces"},
+    {num:'9', name:"Leaflets, pamphlets & books", example:"Distribute printed information door-to-door"},
+    {num:'11', name:"Records, radio & television", example:"Call in to a radio show; post a video explanation of an issue"},
+  ],
+  4: [
+    {num:'4', name:"Signed public statements", example:"Sign a petition or open letter — individually or as a group"},
+    {num:'10', name:"Newspapers & journals", example:"Write a letter to the editor; contribute to an alternative publication"},
+    {num:'2', name:"Letters of opposition or support", example:"Write to or email your representative with your name attached"},
+    {num:'6', name:"Group or mass petitions", example:"Organize neighbors to sign and deliver a petition in person"},
+    {num:'97', name:"Literature & speeches advocating resistance", example:"Write and distribute material calling for noncooperation"},
+  ],
+  5: [
+    {num:'', name:"Call one of your representatives", example:"scripts from a Shadow Government, Existential Republic"},
+    {num:'', name:"Call citizens on a list", example:"Voters, Independents, party members, etc."},
+  ],
+  6: [
+    {num:'1', name:"Public speeches", example:"Speak at a town hall, school board, or city council meeting"},
+    {num:'5', name:"Declarations of indictment & intention", example:"Public statement naming what is wrong and what you plan to do"},
+    {num:'20', name:"Prayer & worship", example:"Organize a prayer vigil or faith community action"},
+    {num:'24', name:"Symbolic lights", example:"Candlelight vigil; lighting display at a public building"},
+    {num:'28', name:"Symbolic sounds", example:"Church bells, horns, singing in public spaces"},
+    {num:'37', name:"Singing", example:"Lead protest songs at gatherings; organize a singing flash mob"},
+    {num:'43', name:"Political mourning", example:"Public mourning for victims of injustice; memorial ceremonies"},
+    {num:'46', name:"Homage at burial places", example:"Gather at grave sites of civil rights heroes on anniversaries"},
+    {num:'52', name:"Silence", example:"Observe a public silent vigil or refuse to speak on command"},
+    {num:'180', name:"Patronize alternative economic institutions", example:"Credit unions, cooperatives, community land trusts"},
+  ],
+  7: [
+    {num:'13', name:"Deputations", example:"Send a small group to meet formally with an official"},
+    {num:'15', name:"Group lobbying", example:"Organize a constituent delegation to visit a legislator\'s office"},
+    {num:'21', name:"Delivering symbolic objects", example:"Deliver empty shoes, flowers, or symbolic items to an official"},
+    {num:'14', name:"Mock awards", example:"Present a \"golden shovel\" award to a corrupt official publicly"},
+    {num:'3', name:"Declarations by organizations", example:"Get your union, church, or club to pass a public resolution"},
+    {num:'17', name:"Mock elections", example:"Run a shadow vote in your community on a real issue"},
+    {num:'26', name:"Paint as protest", example:"Chalk art, banner painting, community mural"},
+    {num:'27', name:"New signs & names", example:"Rename a street or plaza in a community ceremony"},
+    {num:'32', name:"Taunting officials", example:"Publicly mock officials with humor and satire"},
+    {num:'35', name:"Humorous skits & pranks", example:"Political satire, street theater, culture jamming, Yes Men tactics"},
+    {num:'166', name:"Guerrilla theater", example:"Dramatic political performance in unexpected public locations"},
+    {num:'36', name:"Performance of plays & music", example:"Organize a political concert, open-mic, or theater performance"},
+    {num:'48', name:"Protest meetings", example:"Organize a community meeting focused on a specific injustice"},
+    {num:'50', name:"Teach-ins", example:"Organize extended educational sessions on a political issue"},
+    {num:'162', name:"Establishing new social patterns", example:"Create new community norms that embody the values you want"},
+    {num:'168', name:"Alternative communication system", example:"Create independent media, radio, or communication networks"},
+    {num:'179', name:"Alternative transportation systems", example:"Build community ride-shares or transport networks"},
+    {num:'192', name:"Teach-in (extended)", example:"Multi-day teach-in bringing experts to educate on complex issues"},
+    {num:'195', name:"Independent press & publishing", example:"Samizdat model — underground printing and distribution"},
+    {num:'33', name:"Fraternization", example:"Build relationships across political lines to find common ground"},
+    {num:'53', name:"Denouncing renegades", example:"Publicly name and call out those who betrayed the cause"},
+  ],
+  8: [
+    {num:'38', name:"Marches", example:"Walk publicly through streets as a visible statement of numbers"},
+    {num:'39', name:"Parades", example:"Organize a permitted parade or procession through town"},
+    {num:'40', name:"Religious processions", example:"Faith community march or procession on a political issue"},
+    {num:'42', name:"Motorcades", example:"Organized vehicle convoy as a visible political statement"},
+    {num:'16', name:"Vigils", example:"Stand outside an office or building with signs"},
+    {num:'29', name:"Symbolic reclamations", example:"Occupy a public space symbolically — brief, permitted"},
+    {num:'30', name:"Rude gestures", example:"Collective jeering or symbolic dismissal of an official"},
+    {num:'34', name:"Haunting officials", example:"Maintain a continuous presence outside an official\'s office"},
+    {num:'12', name:"Skywriting & earthwriting", example:"Aerial banners at events; large-scale public art"},
+    {num:'44', name:"Mock funerals", example:"Carry a symbolic coffin to represent what is being killed"},
+    {num:'45', name:"Demonstrative funerals", example:"Attend the actual funeral of an injustice victim publicly"},
+    {num:'47', name:"Assemblies of protest or support", example:"Hold a public meeting, rally, or town hall on an issue"},
+    {num:'51', name:"Walk-outs", example:"Leave an event, ceremony, or session in protest"},
+    {num:'61', name:"Boycott of social affairs", example:"Refuse to attend official social functions or galas"},
+    {num:'96', name:"Refusal of public support", example:"Refuse to publicly praise or endorse officials or policies"},
+    {num:'148', name:"Reverse trial", example:"Put the oppressor on symbolic trial in a public forum"},
+    {num:'196', name:"Mass assembly & demonstration", example:"Very large-scale organized public gathering — 500,000+"},
+  ],
+  9: [
+    {num:'31', name:"Haunting officials", example:"Follow and silently witness an official\'s public appearances"},
+    {num:'55', name:"Social boycott", example:"Refuse social interaction with those whose actions you oppose"},
+    {num:'56', name:"Selective social boycott", example:"Ostracize specific people while maintaining others"},
+    {num:'65', name:"Stay-at-home", example:"Collective refusal to leave homes — citywide or nationwide"},
+    {num:'69', name:"Consumers\' boycott", example:"Stop buying from companies that fund or support injustice"},
+    {num:'70', name:"Nonconsumption of boycotted goods", example:"Refuse to buy specific products — the grape boycott model"},
+    {num:'64', name:"Withdrawal from social institutions", example:"Leave a church, club, or organization that supports injustice"},
+    {num:'41', name:"Pilgrimages", example:"Long-distance march to a significant destination — Gandhi\'s salt march model"},
+    {num:'49', name:"Camouflaged meetings of protest", example:"Hold a meeting under a neutral cover when direct protest is risky"},
+    {num:'54', name:"Sanctuary", example:"Provide refuge to someone being persecuted unjustly"},
+    {num:'108', name:"Reluctant & slow compliance", example:"Comply with unjust rules at the absolute slowest possible pace"},
+    {num:'109', name:"Nonobedience in absence of direct supervision", example:"Follow just rules; quietly ignore unjust ones when unsupervised"},
+    {num:'163', name:"Overloading of facilities", example:"Flood a system with legitimate demands — FOIA requests, phone calls"},
+    {num:'177', name:"Selective patronage", example:"Actively direct spending toward businesses that support your values"},
+    {num:'57', name:"Lysistratic nonaction", example:"Withhold intimate relations as political leverage"},
+    {num:'58', name:"Excommunication", example:"Formal exclusion from a religious or civic community"},
+    {num:'59', name:"Interdict", example:"Religious authority withdraws sacraments or services"},
+    {num:'60', name:"Suspension of social & sports activities", example:"Cancel cultural or sports events in protest"},
+    {num:'62', name:"Student strike", example:"Students refuse to attend school or class"},
+    {num:'68', name:"Sanctuary", example:"Community collectively protects persecuted individuals"},
+    {num:'71', name:"Policy of austerity", example:"Collective voluntary reduction of consumption to deny tax revenue"},
+    {num:'73', name:"Refusal to rent", example:"Refuse to rent property to parties connected to injustice"},
+    {num:'74', name:"National consumers\' boycott", example:"Nationwide boycott of a country\'s goods — apartheid model"},
+    {num:'75', name:"International consumers\' boycott", example:"Global coordinated boycott of a company or nation"},
+    {num:'79', name:"Traders\' boycott", example:"Businesses refuse to trade with a targeted party"},
+    {num:'80', name:"Refusal to let or sell property", example:"Refuse to sell or rent to parties connected to injustice"},
+    {num:'81', name:"Lockout", example:"Employers shut operations to resist unjust demands"},
+    {num:'84', name:"Withdrawal of bank deposits", example:"Bank run or mass withdrawal to pressure a financial institution"},
+    {num:'87', name:"Severance of funds & credit", example:"Cut off financial support to a targeted institution"},
+    {num:'90', name:"Domestic embargo", example:"Refuse to trade with a particular region or company within the country"},
+    {num:'91', name:"Blacklisting of traders", example:"Organize and publish lists of businesses supporting injustice"},
+    {num:'92', name:"International sellers\' embargo", example:"International coordinated refusal to sell to a targeted nation"},
+    {num:'93', name:"International buyers\' embargo", example:"International coordinated refusal to buy from a targeted nation"},
+    {num:'94', name:"International trade embargo", example:"Full trade cutoff coordinated across multiple nations"},
+    {num:'98', name:"Boycott of legislative bodies", example:"Elected representatives refuse to attend sessions"},
+    {num:'99', name:"Boycott of elections", example:"Collective refusal to participate in a rigged election"},
+    {num:'101', name:"Boycott of government departments, agencies & other bodies", example:"Refuse to interact with or recognize specific agencies"},
+    {num:'102', name:"Withdrawal from government educational institutions", example:"Pull children from government schools in protest"},
+    {num:'103', name:"Boycott of government-supported organizations", example:"Refuse to participate in government-backed civil groups"},
+    {num:'106', name:"Refusal to accept appointed officials", example:"Publicly refuse to recognize an unlawfully appointed official"},
+    {num:'119', name:"Stalling & obstruction", example:"Deliberately delay unjust processes through bureaucratic means"},
+    {num:'124', name:"Quasi-legal evasions & delays", example:"Use legal technicalities to delay or complicate unjust enforcement"},
+    {num:'125', name:"Noncooperation by constituent governmental units", example:"State or local governments refuse to implement federal mandates"},
+    {num:'126', name:"Changes in diplomatic & other representation", example:"Recall ambassadors; downgrade diplomatic relations"},
+    {num:'127', name:"Delay & cancellation of diplomatic events", example:"Cancel state visits, summits, or ceremonies in protest"},
+    {num:'128', name:"Withholding of diplomatic recognition", example:"Refuse to recognize a government as legitimate"},
+    {num:'129', name:"Severance of diplomatic relations", example:"Cut off all diplomatic ties with a regime"},
+    {num:'130', name:"Withdrawal from international organizations", example:"Exit treaties, alliances, or international bodies in protest"},
+    {num:'131', name:"Refusal of membership in international bodies", example:"Refuse to join or participate in international agreements"},
+    {num:'132', name:"Expulsion from international organizations", example:"Organize to expel a regime from international bodies"},
+    {num:'149', name:"Nonviolent harassment", example:"Persistent, legal, peaceful pressure on individuals enabling injustice"},
+    {num:'165', name:"Speak-in", example:"Deliver long speeches to consume official time and prevent action"},
+    {num:'167', name:"Alternative social institutions", example:"Build parallel social services — community schools, clinics, mutual aid"},
+    {num:'174', name:"Preclusive purchasing", example:"Buy up supplies to prevent the oppressor from obtaining them"},
+    {num:'178', name:"Alternative markets", example:"Create new trading systems that bypass the unjust economy"},
+    {num:'181', name:"Overloading of administrative systems", example:"File massive numbers of legal challenges, applications, forms"},
+    {num:'182', name:"Disclosing identities of secret agents", example:"Expose informants or undercover agents operating against the movement"},
+    {num:'188', name:"Nonviolent harassment II", example:"Sustained, escalating, legal pressure campaign on key individuals"},
+    {num:'194', name:"Independent broadcasting", example:"Pirate or unlicensed radio/TV to reach people past censorship"},
+  ],
+  10: [
+    {num:'22', name:"Protest disrobings", example:"Symbolic removal of clothing as protest — FEMEN-style"},
+    {num:'23', name:"Destruction of own property", example:"Burn your draft card, cut up your credit card publicly"},
+    {num:'63', name:"Social disobedience", example:"Deliberately violate social norms to expose injustice"},
+    {num:'66', name:"Total personal noncooperation", example:"Refuse all cooperation with authorities; Gandhi model"},
+    {num:'72', name:"Rent withholding", example:"Tenants collectively refuse to pay rent to a slumlord"},
+    {num:'85', name:"Refusal to pay fees, dues & assessments", example:"Withhold fees from an organization whose actions you oppose"},
+    {num:'86', name:"Refusal to pay debts or interest", example:"Collective refusal to repay predatory debt — debt strike"},
+    {num:'88', name:"Revenue refusal", example:"Refuse to pay taxes or fees to an unjust authority"},
+    {num:'89', name:"Refusal of a government\'s money", example:"Refuse to accept or use currency issued by an illegitimate regime"},
+    {num:'95', name:"Withholding or withdrawal of allegiance", example:"Refuse to swear allegiance to an illegitimate authority"},
+    {num:'104', name:"Refusal of assistance to enforcement agents", example:"Do not help police, ICE, or other enforcement find targets"},
+    {num:'105', name:"Removal of own signs & placemarks", example:"Remove street signs and markers to hinder enforcement"},
+    {num:'107', name:"Refusal to dissolve existing institutions", example:"Refuse to comply with orders to disband a legitimate body"},
+    {num:'110', name:"Popular nonobedience", example:"Mass refusal to comply with an unjust law or order"},
+    {num:'111', name:"Disguised disobedience", example:"Appear to comply while actually subverting the unjust rule"},
+    {num:'112', name:"Refusal of an assemblage to disperse", example:"Remain in place when ordered to leave — sit-in precursor"},
+    {num:'113', name:"Sit-down", example:"Occupy seats in a public space and refuse to leave"},
+    {num:'114', name:"Noncooperation with conscription & deportation", example:"Refuse draft or deportation orders; sanctuary networks"},
+    {num:'115', name:"Hiding, escape & false identities", example:"Help people evade unjust persecution — Underground Railroad model"},
+    {num:'116', name:"Civil disobedience of \"neutral\" laws", example:"Break a neutral law to make a point about a related injustice"},
+    {num:'117', name:"Selective refusal of assistance by government aides", example:"Government employees refuse to carry out specific unjust orders"},
+    {num:'118', name:"Blocking of lines of command & information", example:"Slow or block the flow of orders within a bureaucracy"},
+    {num:'120', name:"General administrative noncooperation", example:"Civil servants collectively refuse to implement unjust policies"},
+    {num:'121', name:"Judicial noncooperation", example:"Judges or lawyers refuse to enforce unjust laws"},
+    {num:'122', name:"Deliberate inefficiency & selective noncooperation by enforcement agents", example:"Police or officials do their jobs poorly for unjust orders"},
+    {num:'123', name:"Mutiny", example:"Military or police collectively refuse to follow unjust orders"},
+    {num:'146', name:"Self-exposure to the elements", example:"Sit or stand in extreme weather to witness injustice publicly"},
+    {num:'147', name:"The fast", example:"Hunger strike as public witness — requires preparation and support"},
+    {num:'150', name:"Sit-in", example:"Occupy a space — office, lunch counter, lobby — and refuse to leave"},
+    {num:'151', name:"Stand-in", example:"Stand in a location where you have been refused access"},
+    {num:'152', name:"Ride-in", example:"Use segregated or restricted transportation in defiance"},
+    {num:'153', name:"Wade-in", example:"Enter a restricted beach, pool, or waterway"},
+    {num:'154', name:"Mill-in", example:"Gather in a space and mill around without specific demands"},
+    {num:'155', name:"Pray-in", example:"Conduct prayer or worship in a restricted or segregated space"},
+    {num:'156', name:"Nonviolent raids", example:"Enter a restricted facility to expose conditions or retrieve documents"},
+    {num:'157', name:"Nonviolent air raids", example:"Drop leaflets or materials from aircraft over a restricted area"},
+    {num:'158', name:"Nonviolent invasion", example:"Mass entry into a forbidden territory or space"},
+    {num:'159', name:"Nonviolent interjection", example:"Place your body between oppressor and victim"},
+    {num:'160', name:"Nonviolent obstruction", example:"Physically block an unjust action — deportation vehicle, bulldozer"},
+    {num:'161', name:"Nonviolent occupation", example:"Occupy a factory, building, or land and refuse to leave"},
+    {num:'164', name:"Stall-in", example:"Deliberately stall vehicles or bodies to block movement"},
+    {num:'170', name:"Stay-in strike", example:"Occupy the workplace while on strike — sit-down strike"},
+    {num:'171', name:"Nonviolent land seizure", example:"Occupy unused land for community farming or housing"},
+    {num:'172', name:"Defiance of blockades", example:"Deliberately break a supply blockade to deliver needed goods"},
+    {num:'173', name:"Politically motivated counterfeiting", example:"Produce alternative currency or documents to undermine unjust system"},
+    {num:'175', name:"Seizure of assets", example:"Take control of assets being used for oppression"},
+    {num:'176', name:"Dumping", example:"Flood a market to undercut prices and deny revenue"},
+    {num:'183', name:"Seeking imprisonment", example:"Deliberately get arrested to expose injustice — King\'s Birmingham model"},
+    {num:'184', name:"Civil disobedience of \"neutral\" laws", example:"Break a neutral law in a calculated way to make a political point"},
+    {num:'187', name:"Self-exposure to the elements II", example:"Extended public exposure to weather as witness to injustice"},
+    {num:'193', name:"Nonviolent task force", example:"Organized unit trained specifically for nonviolent direct action"},
+    {num:'197', name:"Mass civil disobedience", example:"Large-scale coordinated refusal to comply with unjust laws"},
+  ],
+  11: [
+    {num:'67', name:"Flight of workers", example:"Workers leave an area to deny labor to an unjust system"},
+    {num:'76', name:"Workmen\'s boycott", example:"Workers refuse to handle or work with certain goods"},
+    {num:'77', name:"Producers\' boycott", example:"Farmers or producers refuse to sell to certain buyers"},
+    {num:'78', name:"Suppliers\' & handlers\' boycott", example:"Refuse to supply or transport goods to a targeted party"},
+    {num:'82', name:"Refusal of industrial assistance", example:"Refuse to provide technical or industrial help to oppressor"},
+    {num:'83', name:"Merchants\' \"general strike\"", example:"Businesses collectively close to protest a policy"},
+    {num:'100', name:"Boycott of government employment & positions", example:"Refuse to work for or within an unjust government"},
+    {num:'133', name:"Protest strike", example:"Brief work stoppage to signal protest — one day or one hour"},
+    {num:'134', name:"Quickie or lightning strikes", example:"Spontaneous short-notice strike without formal organization"},
+    {num:'135', name:"Slowdown strike", example:"Work at minimum possible speed while technically complying"},
+    {num:'136', name:"Work-to-rule strike", example:"Follow every rule to the letter, grinding work to a halt"},
+    {num:'137', name:"Reporting \"sick\" (sick-in)", example:"Mass \"illness\" among workers — coordinated sick-out"},
+    {num:'138', name:"Strike by resignation", example:"Mass resignations from positions to deny services"},
+    {num:'139', name:"Limited strike", example:"Strike by specific workers or at specific times"},
+    {num:'140', name:"Selective strike", example:"Workers in one sector stop work over a specific policy"},
+    {num:'141', name:"Bumper strike", example:"Alternating strikes across industries to maintain pressure"},
+    {num:'142', name:"Generalized strike", example:"Strike across multiple industries simultaneously"},
+    {num:'143', name:"General strike", example:"Total work stoppage across all or most of the economy"},
+    {num:'144', name:"Hartal", example:"Complete economic and social shutdown — Indian independence model"},
+    {num:'145', name:"Economic shutdown", example:"Total suspension of economic activity in protest"},
+    {num:'169', name:"Reverse strike", example:"Workers do extra work — or do work the employer refuses to do"},
+    {num:'185', name:"Work-on without collaboration", example:"Continue doing your work while refusing to cooperate with oppressors"},
+    {num:'186', name:"Dual sovereignty & parallel government", example:"Establish parallel democratic institutions when official ones fail"},
+    {num:'189', name:"Alternative legislative bodies", example:"Create shadow legislatures that draft and pass alternative laws"},
+    {num:'190', name:"Alternative government", example:"Stand up a full parallel government with its own authority"},
+    {num:'191', name:"Alternative police & enforcement", example:"Community-organized peacekeeping independent of state police"},
+    {num:'198', name:"Dual sovereignty & parallel government (full)", example:"Full parallel democratic institutions — the ultimate nonviolent power transfer"},
+  ],
+};
+
+const RUNG_META = {
+  1: {label:'Stay Informed', bg:'#E6F1FB', fg:'#185FA5'},
+  2: {label:'Share Voice Privately', bg:'#E6F1FB', fg:'#185FA5'},
+  3: {label:'Amplify & Share', bg:'#EAF3DE', fg:'#3B6D11'},
+  4: {label:'Communicate in Writing', bg:'#EAF3DE', fg:'#3B6D11'},
+  5: {label:'Make Phone Calls', bg:'#EAF3DE', fg:'#3B6D11'},
+  6: {label:'Show Up Locally', bg:'#FAEEDA', fg:'#BA7517'},
+  7: {label:'Organize Locally', bg:'#FAEEDA', fg:'#BA7517'},
+  8: {label:'Visible Public Action', bg:'#FAEEDA', fg:'#BA7517'},
+  9: {label:'Sustained Pressure', bg:'#FCEBEB', fg:'#A32D2D'},
+  10: {label:'Civil Disobedience', bg:'#FCEBEB', fg:'#A32D2D'},
+  11: {label:'Strike & Withdrawal', bg:'#FCEBEB', fg:'#A32D2D'},
+};
+
+const completedActions = new Set();
+
+function buildActionMenu(filterRung) {
+  const container = document.getElementById('actions-container');
+  if (!container) return;
+  container.innerHTML = '';
+  const rungs = filterRung === 'all'
+    ? Object.keys(SHARP_METHODS).map(Number).sort((a,b)=>a-b)
+    : [parseInt(filterRung)];
+  rungs.forEach(rung => {
+    const methods = SHARP_METHODS[rung] || [];
+    const meta = RUNG_META[rung] || {label:'', bg:'#E6F1FB', fg:'#185FA5'};
+    const section = document.createElement('div');
+    section.style.marginBottom = '10px';
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'padding:10px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border-radius:0 8px 0 0;border-left:3px solid ' + meta.fg + ';background:' + meta.bg + ';';
+    hdr.innerHTML = '<span style="font-size:13px;font-weight:600;color:' + meta.fg + ';">RUNG ' + rung + ' — ' + meta.label.toUpperCase() + '</span><span style="font-size:12px;color:' + meta.fg + ';">' + methods.length + ' actions <i class="ti ti-chevron-down" id="chev-' + rung + '"></i></span>';
+    hdr.onclick = () => toggleRungSection(rung);
+    section.appendChild(hdr);
+    const list = document.createElement('div');
+    list.id = 'rung-methods-' + rung;
+    list.style.cssText = 'background:var(--bg);border:0.5px solid var(--border);border-top:none;border-radius:0 0 8px 8px;';
+    methods.forEach((m, idx) => {
+      const key = rung + '-' + idx;
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:flex-start;gap:10px;padding:9px 14px;border-bottom:0.5px solid var(--border);';
+      row.id = 'action-row-' + key;
+      const numBadge = m.num ? '<span style="font-size:10px;background:var(--bg2);border-radius:4px;padding:1px 5px;color:var(--text3);flex-shrink:0;margin-top:2px;">#' + m.num + '</span>' : '<span style="width:28px;flex-shrink:0;"></span>';
+      row.innerHTML = '<input type="checkbox" id="cb-' + key + '" style="margin-top:3px;flex-shrink:0;width:15px;height:15px;cursor:pointer;" onchange="toggleAction(\'' + key + '\',this)">' + numBadge + '<div style="flex:1;"><div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px;">' + m.name + '</div>' + (m.example ? '<div style="font-size:11px;color:var(--text3);line-height:1.4;">' + m.example + '</div>' : '') + '</div>';
+      list.appendChild(row);
+    });
+    section.appendChild(list);
+    container.appendChild(section);
+  });
+  document.getElementById('action-count').textContent = '206 actions · ' + completedActions.size + ' completed';
+}
+
+function toggleRungSection(rung) {
+  const list = document.getElementById('rung-methods-' + rung);
+  const chev = document.getElementById('chev-' + rung);
+  if (!list) return;
+  const hidden = list.style.display === 'none';
+  list.style.display = hidden ? 'block' : 'none';
+  if (chev) chev.className = hidden ? 'ti ti-chevron-up' : 'ti ti-chevron-down';
+}
+
+function toggleAction(key, cb) {
+  const row = document.getElementById('action-row-' + key);
+  if (cb.checked) { completedActions.add(key); if (row) row.style.background = '#EAF3DE'; }
+  else { completedActions.delete(key); if (row) row.style.background = ''; }
+  document.getElementById('action-count').textContent = '206 actions · ' + completedActions.size + ' completed';
+}
+
+function filterByRung(val) { buildActionMenu(val); }
+
+</script>
+</body>
+</html>

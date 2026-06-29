@@ -1,0 +1,894 @@
+<!--
+=======================================================================
+  A SHADOW GOVERNMENT — ISSUE PAGE TEMPLATE
+=======================================================================
+  HOW TO USE THIS FILE
+  ---------------------
+  1. Make a copy of this file.
+  2. Rename it to your issue: healthcare.html, climate.html, etc.
+  3. Search for every marker: [REPLACE: description]
+     and swap in your real content.
+  4. [ADD MORE: description] means copy the HTML block above it
+     and paste additional instances below.
+  5. [REMOVE IF UNUSED] means delete that block if it doesn't apply.
+  6. Delete this comment block when you're done.
+  7. Upload the finished file to the GitHub repo.
+
+  QUESTIONS? Open an issue on GitHub or post in the working group.
+=======================================================================
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Shadow Government — [REPLACE: Issue Name]</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0d0d0d;
+    --white: #f7f5f0;
+    --red: #c0392b;
+    --red-dark: #922b21;
+    --blue: #1a3a5c;
+    --blue-mid: #2471a3;
+    --blue-light: #d6e8f7;
+    --gold: #b7950b;
+    --gold-light: #fef9e7;
+    --gray-1: #2c2c2c;
+    --gray-2: #555;
+    --gray-3: #888;
+    --gray-4: #ccc;
+    --gray-5: #eee;
+    --green: #1e8449;
+    --green-light: #d5f5e3;
+    --orange: #ca6f1e;
+
+    --topbar-h: 44px;
+    --left-w: 170px;
+    --right-w: 180px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--gray-5);
+    color: var(--black);
+    font-size: 14px;
+    line-height: 1.55;
+    height: 100vh;
+    overflow: hidden; /* page itself doesn't scroll — panels do */
+  }
+
+  /* ── TOPBAR ── */
+  #topbar {
+    height: var(--topbar-h);
+    background: var(--black);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 18px;
+    border-bottom: 3px solid var(--red);
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'IBM Plex Serif', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    white-space: nowrap;
+    letter-spacing: -0.3px;
+  }
+  .logo span { color: var(--red); }
+  .issue-label {
+    background: var(--red);
+    color: var(--white);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .issue-title {
+    font-family: 'IBM Plex Serif', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--white);
+    flex: 1;
+  }
+  .topbar-stat {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+
+  /* ── MAIN LAYOUT ── */
+  #layout {
+    display: grid;
+    grid-template-columns: var(--left-w) 1fr var(--right-w);
+    grid-template-rows: 1fr;
+    height: calc(100vh - var(--topbar-h));
+    margin-top: var(--topbar-h);
+    gap: 0;
+  }
+
+  /* ── LEFT: SITE MENU ── */
+  #left-nav {
+    background: var(--blue);
+    height: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.2) transparent;
+  }
+  #left-nav::-webkit-scrollbar { width: 4px; }
+  #left-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+
+  .nav-section-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 14px 12px 5px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    color: #a9c4db;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+    text-decoration: none;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.08); color: var(--white); }
+  .nav-item.active {
+    background: rgba(255,255,255,0.12);
+    color: var(--white);
+    border-left-color: var(--gold);
+    font-weight: 600;
+  }
+  .nav-item .nav-icon { font-size: 0.95rem; flex-shrink: 0; width: 18px; text-align: center; }
+  .nav-item .nav-badge {
+    margin-left: auto;
+    background: var(--red);
+    color: var(--white);
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .nav-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    margin: 8px 12px;
+  }
+
+  .nav-army-box {
+    margin: 10px 10px 14px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 5px;
+    padding: 10px;
+  }
+  .nav-army-box .label { font-size: 0.65rem; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; font-family: 'IBM Plex Mono', monospace; }
+  .nav-army-row { display: flex; justify-content: space-between; font-size: 0.72rem; color: #a9c4db; margin-bottom: 3px; }
+  .nav-army-row .num { color: var(--gold); font-family: 'IBM Plex Mono', monospace; font-weight: 600; }
+
+  /* ── MIDDLE: 3 STACKED BOXES ── */
+  #middle {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 0;
+    background: var(--gray-5);
+    overflow: hidden;
+  }
+
+  .middle-box {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 2px solid var(--gray-4);
+    overflow: hidden;
+  }
+
+  /* Top box: "So what's the issue?" — tallest */
+  #box-issue { flex: 4; min-height: 0; }
+  /* Middle box: "Who's involved?" — medium */
+  #box-who   { flex: 3; min-height: 0; }
+  /* Bottom box: "What's happening?" — shallowest, 1-2 headlines visible */
+  #box-now   { flex: 2; min-height: 0; }
+
+  .box-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    background: var(--blue);
+    flex-shrink: 0;
+    cursor: default;
+  }
+  .box-header-icon { font-size: 1rem; }
+  .box-header-title {
+    font-family: 'IBM Plex Serif', serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--white);
+    flex: 1;
+  }
+  .box-header-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.5px;
+  }
+
+  .box-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px;
+    background: var(--white);
+    scrollbar-width: thin;
+    scrollbar-color: var(--gray-4) transparent;
+  }
+  .box-body::-webkit-scrollbar { width: 5px; }
+  .box-body::-webkit-scrollbar-thumb { background: var(--gray-4); border-radius: 3px; }
+
+  /* Issue box content */
+  .issue-summary {
+    font-family: 'IBM Plex Serif', serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--blue);
+    line-height: 1.4;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1.5px solid var(--blue-light);
+  }
+  .issue-body { font-size: 0.85rem; color: var(--gray-1); line-height: 1.7; }
+  .issue-body p { margin-bottom: 10px; }
+
+  .key-facts { margin-top: 14px; }
+  .key-facts-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--gray-3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .fact-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 7px;
+    font-size: 0.83rem;
+    color: var(--gray-1);
+    align-items: flex-start;
+  }
+  .fact-bullet {
+    width: 6px;
+    height: 6px;
+    background: var(--red);
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+
+  /* Who's involved content */
+  .actor-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .actor-card {
+    border: 1.5px solid var(--gray-4);
+    border-radius: 5px;
+    padding: 10px 12px;
+  }
+  .actor-card.ally { border-color: var(--green); background: var(--green-light); }
+  .actor-card.opponent { border-color: var(--red); background: #fadbd8; }
+  .actor-card.neutral { border-color: var(--gold); background: var(--gold-light); }
+  .actor-type {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 4px;
+  }
+  .actor-type.ally { color: var(--green); }
+  .actor-type.opponent { color: var(--red-dark); }
+  .actor-type.neutral { color: var(--gold); }
+  .actor-name { font-weight: 600; font-size: 0.82rem; color: var(--black); }
+  .actor-desc { font-size: 0.75rem; color: var(--gray-2); margin-top: 3px; }
+
+  /* What's happening now — headline items */
+  .headline-item {
+    display: flex;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--gray-5);
+    align-items: flex-start;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .headline-item:hover { background: var(--blue-light); margin: 0 -14px; padding: 9px 14px; }
+  .headline-item:last-child { border-bottom: none; }
+  .headline-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+  .headline-text { flex: 1; }
+  .headline-title { font-weight: 600; font-size: 0.83rem; color: var(--black); line-height: 1.35; }
+  .headline-meta { font-size: 0.72rem; color: var(--gray-3); margin-top: 2px; font-family: 'IBM Plex Mono', monospace; }
+  .headline-arrow { color: var(--gray-4); font-size: 0.8rem; margin-top: 3px; }
+
+  /* ── RIGHT: PARTICIPATION LADDER ── */
+  #right-ladder {
+    background: var(--black);
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ladder-header {
+    background: var(--black);
+    padding: 10px 12px 8px;
+    border-bottom: 2px solid var(--gold);
+    flex-shrink: 0;
+  }
+  .ladder-header-title {
+    font-family: 'IBM Plex Serif', serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--white);
+  }
+  .ladder-header-sub {
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.4);
+    margin-top: 2px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .ladder-scroll {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column-reverse; /* rungs numbered bottom-up */
+    padding: 8px 8px 4px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.15) transparent;
+    gap: 5px;
+  }
+  .ladder-scroll::-webkit-scrollbar { width: 4px; }
+  .ladder-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+  .rung {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.18s;
+    overflow: hidden;
+  }
+  .rung:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.2); }
+  .rung.open { background: rgba(255,255,255,0.09); border-color: var(--gold); }
+
+  .rung-top {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 9px;
+  }
+  .rung-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--gold);
+    width: 18px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+  .rung-icon { font-size: 0.9rem; flex-shrink: 0; }
+  .rung-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--white);
+    flex: 1;
+    line-height: 1.3;
+  }
+  .rung-chevron {
+    font-size: 0.6rem;
+    color: rgba(255,255,255,0.3);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+  .rung.open .rung-chevron { transform: rotate(180deg); color: var(--gold); }
+
+  .rung-detail {
+    display: none;
+    padding: 8px 9px 10px 34px;
+    font-size: 0.73rem;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.55;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    max-height: 160px;        /* scroll if content is long */
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.15) transparent;
+  }
+  .rung-detail::-webkit-scrollbar { width: 3px; }
+  .rung-detail::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+  .rung.open .rung-detail { display: block; }
+  .rung-members {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--gold);
+    margin-top: 6px;
+  }
+  .rung-action {
+    display: inline-block;
+    margin-top: 7px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--gold);
+    border: 1px solid rgba(183,149,11,0.4);
+    padding: 2px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .rung-action:hover { background: rgba(183,149,11,0.15); }
+
+  /* rung color accent by intensity */
+  .rung[data-level="low"] { border-left: 3px solid var(--green); }
+  .rung[data-level="med"] { border-left: 3px solid var(--gold); }
+  .rung[data-level="high"] { border-left: 3px solid var(--red); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    body { overflow: auto; }
+    #layout {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto auto;
+      height: auto;
+    }
+    #left-nav { height: auto; max-height: 220px; }
+    #right-ladder { height: 360px; }
+    #middle { height: auto; }
+    #box-issue, #box-who, #box-now { flex: none; height: 320px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <div class="logo">A <span>Shadow</span> Government</div>
+  <span class="issue-label">Issue Working Group</span>
+  <div class="issue-title">[REPLACE: emoji + Issue Name — e.g. 🗳️ Voting Rights]</div>
+  <div class="topbar-stat">[REPLACE: member count] members · [REPLACE: N] campaigns</div>
+</div>
+
+<!-- MAIN LAYOUT: left | middle | right -->
+<div id="layout">
+
+  <!-- ══════════════════════════════
+       LEFT: SITE MENU
+  ══════════════════════════════ -->
+  <nav id="left-nav">
+    <div class="nav-army-box">
+      <div class="label">Army Status</div>
+      <div class="nav-army-row"><span>Members</span><span class="num">4,219</span></div>
+      <div class="nav-army-row"><span>Campaigns</span><span class="num">47</span></div>
+      <div class="nav-army-row"><span>This week</span><span class="num">847 acts</span></div>
+    </div>
+
+    <div class="nav-section-label">Main</div>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">🏠</span> Home
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">📊</span> Rep Scorecard
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">🚨</span> Take Action
+      <span class="nav-badge">8</span>
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">⚔️</span> Our Army
+    </a>
+
+    <div class="nav-divider"></div>
+    <div class="nav-section-label">Issues</div>
+
+    <a class="nav-item active" href="#">
+      <span class="nav-icon">[REPLACE: emoji]</span> [REPLACE: Issue Name]
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">⚖️</span> Rule of Law
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">🏥</span> Healthcare
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">🌍</span> Climate
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">💰</span> Econ. Justice
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">🎓</span> Education
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">🏛️</span> Dark Money
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">🏘️</span> Housing
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">👮</span> Crim. Justice
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">📡</span> Media / Disinfo
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">🛡️</span> Civil Liberties
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">🌾</span> Agriculture
+    </a>
+
+    <div class="nav-divider"></div>
+    <div class="nav-section-label">Learn & Grow</div>
+
+    <a class="nav-item" href="#">
+      <span class="nav-icon">🪜</span> Participation Ladder
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">🏅</span> Merit Badges
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">📋</span> 198 Methods
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">📚</span> Citizenship Skills
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">📜</span> Social Contract
+    </a>
+  </nav>
+
+  <!-- ══════════════════════════════
+       MIDDLE: 3 STACKED BOXES
+  ══════════════════════════════ -->
+  <div id="middle">
+
+    <!-- BOX 1: SO WHAT'S THE ISSUE? -->
+    <div class="middle-box" id="box-issue">
+      <div class="box-header">
+        <span class="box-header-icon">❓</span>
+        <span class="box-header-title">So what's the issue?</span>
+        <span class="box-header-tag">BRIEFING</span>
+      </div>
+      <div class="box-body">
+        <div class="issue-summary">
+          [REPLACE: One or two punchy sentences — the core of the issue in plain language. What is broken, and why does it matter?]
+        </div>
+        <div class="issue-body">
+          <p>[REPLACE: Paragraph 1 — background and history. How did we get here? What changed, and when?]</p>
+          <p>[REPLACE: Paragraph 2 — how the problem operates. What are the mechanisms? Be specific.]</p>
+          <p>[REPLACE: Paragraph 3 — why this issue connects to everything else. Stakes. Urgency.]</p>
+          <!-- [ADD MORE: additional paragraphs if needed] -->
+        </div>
+        <div class="key-facts">
+          <div class="key-facts-title">Key Facts</div>
+          <div class="fact-item"><div class="fact-bullet"></div><div>[REPLACE: Fact 1 with source in parentheses]</div></div>
+          <div class="fact-item"><div class="fact-bullet"></div><div>[REPLACE: Fact 2 with source]</div></div>
+          <div class="fact-item"><div class="fact-bullet"></div><div>[REPLACE: Fact 3 with source]</div></div>
+          <div class="fact-item"><div class="fact-bullet"></div><div>[REPLACE: Fact 4 with source]</div></div>
+          <div class="fact-item"><div class="fact-bullet"></div><div>[REPLACE: Fact 5 with source]</div></div>
+          <!-- [ADD MORE: copy a fact-item div for additional facts] -->
+        </div>
+      </div>
+    </div>
+
+    <!-- BOX 2: WHO'S INVOLVED? -->
+    <div class="middle-box" id="box-who">
+      <div class="box-header">
+        <span class="box-header-icon">👥</span>
+        <span class="box-header-title">Who's involved?</span>
+        <span class="box-header-tag">PLAYERS</span>
+      </div>
+      <div class="box-body">
+        <!-- ALLIES: copy this block for each ally organization -->
+        <div class="actor-grid">
+          <div class="actor-card ally">
+            <div class="actor-type ally">Ally</div>
+            <div class="actor-name">[REPLACE: Organization name]</div>
+            <div class="actor-desc">[REPLACE: What they do on this issue. One or two sentences.]</div>
+          </div>
+          <div class="actor-card ally">
+            <div class="actor-type ally">Ally</div>
+            <div class="actor-name">[REPLACE: Organization name]</div>
+            <div class="actor-desc">[REPLACE: What they do on this issue.]</div>
+          </div>
+          <!-- [ADD MORE: copy an actor-card ally div for additional allies] -->
+
+          <!-- OPPONENTS: copy this block for each opponent -->
+          <div class="actor-card opponent">
+            <div class="actor-type opponent">Opponent</div>
+            <div class="actor-name">[REPLACE: Organization or person name]</div>
+            <div class="actor-desc">[REPLACE: How they oppose progress on this issue. Be specific.]</div>
+          </div>
+          <div class="actor-card opponent">
+            <div class="actor-type opponent">Opponent</div>
+            <div class="actor-name">[REPLACE: Organization or person name]</div>
+            <div class="actor-desc">[REPLACE: How they oppose progress on this issue.]</div>
+          </div>
+          <!-- [ADD MORE: copy an actor-card opponent div for additional opponents] -->
+
+          <!-- PRESSURE TARGETS: people/institutions we can move -->
+          <div class="actor-card neutral">
+            <div class="actor-type neutral">Pressure Target</div>
+            <div class="actor-name">[REPLACE: Name — e.g. State Governors, DOJ, specific legislator]</div>
+            <div class="actor-desc">[REPLACE: What power they have. Why they're persuadable. What we want from them.]</div>
+          </div>
+          <div class="actor-card neutral">
+            <div class="actor-type neutral">Pressure Target</div>
+            <div class="actor-name">[REPLACE: Name]</div>
+            <div class="actor-desc">[REPLACE: What we want from them.]</div>
+          </div>
+          <!-- [ADD MORE: copy an actor-card neutral div for additional targets] -->
+          <!-- [REMOVE IF UNUSED: delete any actor-card blocks you don't need] -->
+        </div>
+      </div>
+    </div>
+
+    <!-- BOX 3: WHAT'S HAPPENING RIGHT NOW? -->
+    <div class="middle-box" id="box-now">
+      <div class="box-header">
+        <span class="box-header-icon">⚡</span>
+        <span class="box-header-title">What's happening right now?</span>
+        <span class="box-header-tag">LIVE FEED</span>
+      </div>
+      <div class="box-body">
+        <!--
+          HEADLINE DOT COLORS:
+            var(--red)   = urgent / action needed
+            var(--gold)  = developing / watch closely
+            var(--green) = win / good news
+          Copy a headline-item div to add more items.
+          Keep the most urgent at the top.
+        -->
+        <div class="headline-item">
+          <div class="headline-dot" style="background:var(--red)"></div>
+          <div class="headline-text">
+            <div class="headline-title">[REPLACE: Headline — what happened, where, what's at stake]</div>
+            <div class="headline-meta">[REPLACE: N days ago] · [REPLACE: State or venue] · 🚨 Action needed</div>
+          </div>
+          <div class="headline-arrow">›</div>
+        </div>
+        <div class="headline-item">
+          <div class="headline-dot" style="background:var(--gold)"></div>
+          <div class="headline-text">
+            <div class="headline-title">[REPLACE: Headline]</div>
+            <div class="headline-meta">[REPLACE: N days ago] · [REPLACE: Location] · ⚖️ In litigation [REMOVE IF UNUSED]</div>
+          </div>
+          <div class="headline-arrow">›</div>
+        </div>
+        <div class="headline-item">
+          <div class="headline-dot" style="background:var(--green)"></div>
+          <div class="headline-text">
+            <div class="headline-title">[REPLACE: Headline — a win or positive development]</div>
+            <div class="headline-meta">[REPLACE: N weeks ago] · [REPLACE: Location] · 🎉 Win to replicate</div>
+          </div>
+          <div class="headline-arrow">›</div>
+        </div>
+        <!-- [ADD MORE: copy a headline-item div for additional items] -->
+      </div>
+    </div>
+
+  </div><!-- end #middle -->
+
+  <!-- ══════════════════════════════
+       RIGHT: PARTICIPATION LADDER
+       (numbered bottom-up via flex-direction: column-reverse)
+  ══════════════════════════════ -->
+  <div id="right-ladder">
+    <div class="ladder-header">
+      <div class="ladder-header-title">🪜 Participation Ladder</div>
+      <div class="ladder-header-sub">BOTTOM = START · TOP = FULLEST COMMITMENT</div>
+    </div>
+
+    <div class="ladder-scroll">
+      <!-- Rungs are written 1→11 in HTML; column-reverse displays 1 at bottom, 11 at top -->
+
+      <div class="rung" data-level="low" onclick="toggleRung(this)">
+        <div class="rung-top">
+          <span class="rung-num">1</span>
+          <span class="rung-icon">📰</span>
+          <span class="rung-label">Stay Informed</span>
+          <span class="rung-chevron">▼</span>
+        </div>
+        <div class="rung-detail">
+          Read the weekly briefing. Follow the news feed. Know what's happening and tell others.
+          <div class="rung-members">1,847 members here</div>
+          <div class="rung-action">Join this rung →</div>
+        </div>
+      </div>
+
+      <div class="rung" data-level="low" onclick="toggleRung(this)">
+        <div class="rung-top">
+          <span class="rung-num">2</span>
+          <span class="rung-icon">💬</span>
+          <span class="rung-label">Have Conversations</span>
+          <span class="rung-chevron">▼</span>
+        </div>
+        <div class="rung-detail">
+          Talk to family, friends, neighbors. Use what you've learned. Don't let bad information go unchallenged at the dinner table.
+          <div class="rung-members">1,203 members here</div>
+          <div class="rung-action">Join this rung →</div>
+        </div>
+      </div>
+
+      <div class="rung" data-level="low" onclick="toggleRung(this)">
+        <div class="rung-top">
+          <span class="rung-num">3</span>
+          <span class="rung-icon">✍️</span>
+          <span class="rung-label">Contact Reps</span>
+          <span class="rung-chevron">▼</span>
+        </div>
+        <div class="rung-detail">
+          Call, write, email your elected officials. Use our templates or write your own. One contact is one vote in their inbox.
+          <div class="rung-members">987 members here</div>
+          <div class="rung-action">Use a template →</div>
+        </div>
+      </div>
+
+      <div class="rung" data-level="low" onclick="toggleRung(this)">
+        <div class="rung-top">
+          <span class="rung-num">4</span>
+          <span class="rung-icon">📢</span>
+          <span class="rung-label">Amplify</span>
+          <span class="rung-chevron">▼</span>
+        </div>
+        <div class="rung-detail">
+          Share campaigns on social media. Write letters to local papers. Show up in comment sections. Be a signal, not noise.
+          <div class="rung-members">743 members here</div>
+          <div class="rung-action">Join this rung →</div>
+        </div>
+      </div>
+
+      <div class="rung" data-level="med" onclick="toggleRung(this)">
+        <div class="rung-top">
+          <span class="rung-num">5</span>
+          <span class="rung-icon">🏛️</span>
+          <span class="rung-label">Attend Public Meetings</span>
+          <span class="rung-chevron">▼</span>
+        </div>
+        <div class="rung-detail">
+          Town halls, school board, city council, county legislature. Physical presence is political power. Bring a friend.
+          <div class="rung-members">521 members here</div>
+          <div class="rung-action">Find a meeting →</div>
+        </div>
+      </div>
+
+      <div class="rung" data-level="med" onclick="toggleRung(this)">
+        <div class="rung-top">
+          <span class="rung-num">6</span>
+          <span class="rung-icon">🗳️</span>
+          <span class="rung-label">Voter Registration</span>
+          <span class="rung-chevron">▼</span>
+        </div>
+        <div class="rung-detail">
+          Register voters. Drive people to polls. Help with absentee ballots. The most undervalued work in democracy.
+          <div class="rung-members">412 members here</div>
+          <div class="rung-action">Get trained →</div>
+        </div>
+      </div>
+
+      <div class="rung" data-level="med" onclick="toggleRung(this)">
+        <div class="rung-top">
+          <span class="rung-num">7</span>
+          <span class="rung-icon">🤝</span>
+          <span class="rung-label">Join a Working Group</span>
+          <span class="rung-chevron">▼</span>
+        </div>
+        <div class="rung-detail">
+          Become a specialist. Coordinate with others on your issue. Share research. Plan and execute campaigns together.
+          <div class="rung-members">298 members here</div>
+          <div class="rung-action">Join Voting Rights WG →</div>
+        </div>
+      </div>
+
+      <div class="rung" data-level="med" onclick="toggleRung(this)">
+        <div class="rung-top">
+          <span class="rung-num">8</span>
+          <span class="rung-icon">📣</span>
+          <span class="rung-label">Organize Locally</span>
+          <span class="rung-chevron">▼</span>
+        </div>
+        <div class="rung-detail">
+          Build a local chapter. Recruit neighbors. Hold your own community meetings. You are the infrastructure.
+          <div class="rung-members">187 members here</div>
+          <div class="rung-action">Start a chapter →</div>
+        </div>
+      </div>
+
+      <div class="rung" data-level="high" onclick="toggleRung(this)">
+        <div class="rung-top">
+          <span class="rung-num">9</span>
+          <span class="rung-icon">🪧</span>
+          <span class="rung-label">Public Demonstration</span>
+          <span class="rung-chevron">▼</span>
+        </div>
+        <div class="rung-detail">
+          Marches, rallies, vigils, pickets. Visible collective action changes the political weather. Numbers matter enormously.
+          <div class="rung-members">143 members here</div>
+          <div class="rung-action">Find an event →</div>
+        </div>
+      </div>
+
+      <div class="rung" data-level="high" onclick="toggleRung(this)">
+        <div class="rung-top">
+          <span class="rung-num">10</span>
+          <span class="rung-icon">💸</span>
+          <span class="rung-label">Economic Action</span>
+          <span class="rung-chevron">▼</span>
+        </div>
+        <div class="rung-detail">
+          Boycotts. Targeted purchasing. Supporting worker cooperatives and ethical businesses. Where you spend is where you vote, every day.
+          <div class="rung-members">98 members here</div>
+          <div class="rung-action">See active boycotts →</div>
+        </div>
+      </div>
+
+      <div class="rung" data-level="high" onclick="toggleRung(this)">
+        <div class="rung-top">
+          <span class="rung-num">11</span>
+          <span class="rung-icon">✊</span>
+          <span class="rung-label">Strike / Withdrawal</span>
+          <span class="rung-chevron">▼</span>
+        </div>
+        <div class="rung-detail">
+          The ultimate expression of collective power. Work stoppages, general strikes, mass withdrawal. Reserved for when other means are exhausted. Gene Sharp methods 183–198.
+          <div class="rung-members">34 members prepared</div>
+          <div class="rung-action">Learn more →</div>
+        </div>
+      </div>
+
+    </div><!-- end .ladder-scroll -->
+  </div><!-- end #right-ladder -->
+
+</div><!-- end #layout -->
+
+<script>
+  function toggleRung(el) {
+    const isOpen = el.classList.contains('open');
+    // Close all rungs first
+    document.querySelectorAll('.rung').forEach(r => r.classList.remove('open'));
+    // Open clicked one if it wasn't already open
+    if (!isOpen) el.classList.add('open');
+  }
+</script>
+</body>
+</html>
